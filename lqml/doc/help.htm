@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Function List</title>
+<meta charset="utf-8">
+</head>
+<body>
+<h2><pre>LQML</pre></h2>
+<pre>
+
+<b>clipboard-text ()</b>
+
+  Calls QGuiApplication::clipboard()->text().
+
+
+<b>copy-all-asset-files ()</b>
+
+  Mobile only. Preamble: all asset files are automatically copied to the app
+  directory on the very first app startup.
+  If you eventually need to copy additional asset files, or replace the current
+  ones, use this function (after installing an app update).
+
+
+<b>define-qt-wrappers (qt-library &rest what)</b>
+
+  Defines Lisp methods for all Qt methods/signals/slots of given library,
+  previously loaded with QLOAD-C++.
+
+    (define-qt-wrappers *c++*)          ; generate wrappers
+    (define-qt-wrappers *c++* :methods) ; Qt methods only (no slots/signals)
+    (my-qt-function *c++* x y)          ; call from Lisp
+
+
+<b>ensure-permissions (&rest permissions)</b>
+
+  Android only; requests the passed permissions. Returns the list of
+  granted permissions. If the permission name starts with
+  'android.permission.', a Lisp symbol of the name only can be passed,
+  otherwise the full identifier must be passed.
+
+    (ensure-permissions :access-fine-location)
+    (ensure-permissions "com.android.alarm.permission.SET_ALARM")
+
+
+<b>find-quick-item (object-name)</b>
+
+  Finds the first QQuickItem matching OBJECT-NAME.
+  See also WITH-ROOT-ITEM if you want to find items inside a specific item,
+  like in a QML Repeater.
+
+
+<b>pixel-ratio ()</b>
+
+  Returns the effective device pixel ratio.
+
+
+<b>q! (method-name item/name &rest arguments)</b>
+
+  For calling methods of QML items.
+
+    (q! |requestPaint| *canvas*)
+
+
+<b>q< (property-name item/name)</b>
+
+  Convenience macro for QML-GET. Use symbol instead of string name.
+
+    (q< |text| *label*)
+    (q< |font.pixelSize| *label*)
+
+
+<b>q> (property-name item/name value)</b>
+
+  Convenience macro for QML-SET. Use symbol instead of string name.
+
+    (q> |text| *label* "greetings!")
+
+
+<b>q>* (property-name item/name value)</b>
+
+  Convenience macro for QML-SET-ALL. Use symbol instead of string name. Sets
+  given property of all items sharing the same 'objectName'.
+
+
+<b>qapropos (string &optional qt-object/name)</b>
+
+  Searches properties, methods, signals, slots for STRING in QObject (e.g.
+  QQuickItem) passed as second argument. A QQuickItem can also be passed by
+  its 'objectName'.
+
+    (qapropos nil *canvas*)
+    (qapropos "color")
+
+
+<b>qapropos* (name &optional qt-object/name)</b>
+
+  Similar to QAPROPOS, returning the results as nested list.
+
+
+<b>qchildren (item/name)</b>
+
+  Like QML function children().
+
+
+<b>qcopy-file (from to)</b>
+
+  Convenience function for android, for e.g. copying files from 'assets:/',
+  which can't be accessed directly from Lisp.
+
+    (qcopy-file "assets:/lib/asdf.fas" "asdf.fas")
+
+
+<b>qdirectory (path)</b>
+
+  Convenience function for android, which works also with 'assets:/'
+  paths.
+
+    (qdirectory "assets:/lib")
+
+
+<b>qeql (qt-object-1 qt-object-2)</b>
+
+  Returns T if passed QT-OBJECTs are pointer equal.
+
+
+<b>qescape (string)</b>
+
+  Calls QString::toHtmlEscaped().
+
+
+<b>qexec (&optional milliseconds)</b>
+
+  Calls QCoreApplication::exec(). Optionally pass the time in milliseconds
+  after which QEventLoop::exit() will be called. See also QSLEEP.
+
+
+<b>qexit ()</b>
+
+  Calls QEventLoop::exit(), in order to exit event processing after a call
+  QEXEC with a timeout. Returns T if the event loop has effectively been
+  exited.
+
+
+<b>qfind-child (qt-object name)</b>
+
+  Calls QObject::findChild<QObject*>().
+
+
+<b>qfrom-utf8 (byte-array)</b>
+
+  Returns the BYTE-ARRAY (vector of octets) converted using
+  QString::fromUtf8().
+
+
+<b>qget (qt-object name)</b>
+
+  Gets a Qt property. Enumerator values are returned as integer values.
+  Returns T as second return value for successful calls.
+
+    (qget *quick-view* |width|)
+
+
+<b>qjs (function item/name &rest arguments)</b>
+
+  Fast and convenient way to call JS functions defined in QML. You may pass
+  up to 10 arguments of the following types:
+  T, NIL, INTEGER, FLOAT, STRING, VECTOR of octets, ... and (nested) lists of
+  mentioned arguments.
+  For the complete list of supported types see 'marshal.cpp:toQVariant()'.
+  A special use case is to populate an item model in QML (using a trivial JS
+  glue code function) which expects a JS dictionary, see example below.
+  N.B: Does not work with JS default arguments.
+
+    (qjs |drawLine| *canvas* x1 y1 x2 y2))
+    (qjs |addPlanet| *planets* (list :name "Jupiter" :src "img/jupiter.png"))
+
+
+<b>qlater (function)</b>
+
+  Calls FUNCTION as soon as the Qt event loop is idle.
+
+
+<b>qload-c++ (library-name &optional unload)</b>
+
+  Loads a custom Qt/C++ plugin (see 'cpp-lib' in sources). The LIBRARY-NAME
+  has to be passed as path to the plugin, without file ending. This offers
+  a simple way to extend your application with your own Qt/C++ functions.
+  The plugin will be reloaded (if supported by the OS) every time you call
+  this function. If the UNLOAD argument is not NIL, the plugin will be
+  unloaded (if supported by the OS).
+  N.B: This works only for Qt functions with the following signature:
+  "QVariant foo(QVariant, ...)" ; max 10 QVariant arguments
+  Since a QVariant can also be of type QVariantList, this is a perfect fit
+  for (nested) Lisp lists.
+
+    (defparameter *c++* (qload-c++ "my-lib"))
+    (qapropos nil *c++*)                      ; documentation
+    (define-qt-wrappers *c++*)                ; Lisp wrapper functions
+
+
+<b>qlog (arg1 &rest args)</b>
+
+  For debug messages. On android they can be captured with 'adb logcat'.
+
+    (qlog 12)
+    (qlog "width" w "height" h)
+    (qlog "x ~A y ~A" x y)
+
+
+<b>qnull (qt-object)</b>
+
+  Only useful if used with UNLESS, in order to check for a valid pointer.
+  Returns T if the argument is not of type QT-OBJECT.
+
+    (unless (qnull ui:*item*)
+      ...)
+
+
+<b>qobject-name (qt-object)</b>
+
+  Returns the QObject::objectName() of passed QT-OBJECT.
+
+
+<b>qprocess-events (&optional exclude-user-input)</b>
+
+  Calls QCoreApplication::processEvents(). Pass T to exclude user input
+  events during event processing.
+
+
+<b>qquit (&optional (exit-status 0) (kill-all-threads t))</b>
+<b>qq</b>
+
+  Terminates LQML. Use this function instead of ECL (ext:quit) to quit
+  gracefully. Negative values for EXIT-STATUS will call C abort() instead of
+  normal program exit.
+
+
+<b>qset (qt-object name1 value1 &optional name2 value2...)</b>
+
+  Sets a Qt property. Enumerators have to be passed as integer values.
+  Returns T as second return value for successful calls.
+
+    (qset *quick-view* |x| 100 |y| 100)
+
+
+<b>qsingle-shot (milliseconds function)</b>
+
+  A single shot timer similar to QTimer::singleShot().
+
+    (qsingle-shot 1000 'one-second-later)
+
+
+<b>qsleep (seconds)</b>
+
+  Similar to SLEEP, but continuing to process Qt events.
+
+
+<b>qversion ()</b>
+
+  Returns the LQML version number as 'year.month.counter'. The second
+  return value is the Qt version as returned by QLibraryInfo::version().
+
+
+<b>reload ()</b>
+
+  Reloads all QML files, clearing the cache.
+
+
+<b>root-item ()</b>
+
+  Returns the root item of the QQuickView.
+
+
+<b>set-clipboard-text (text)</b>
+
+  Calls QGuiApplication::clipboard()->setText().
+
+
+<b>tr (source &optional context plural-number)</b>
+
+  Macro expanding to QTRANSLATE, which calls QCoreApplication::translate().
+  Both SOURCE and CONTEXT can be Lisp forms evaluating to constant strings
+  (at compile time). The CONTEXT argument defaults to the Lisp file name.
+  For the PLURAL-NUMBER, see Qt Assistant.
+
+
+<b>view-status-changed (status)</b>
+
+  Redefine this function if you want to be notified on status changes of
+  QQuickView, e.g. after a RELOAD.
+
+    (defun qml:view-status-changed (status)
+      (when (= 1 status)
+        (populate-item-model)))
+
+
+<b>with-root-item (root-item)</b>
+
+  Say you have a Repeater QML item with multiple instances of the same
+  QQuickItem. The children of those QQuickItems all have the same object names,
+  respectively. In order to access those child items, we need to search in one
+  specific item of the Repeater.
+
+    (with-root-item (q! |itemAt| ui:*repeater* 0)
+      (q< |text| ui:*edit*))
+
+
+</pre>
+</body>
+</html>

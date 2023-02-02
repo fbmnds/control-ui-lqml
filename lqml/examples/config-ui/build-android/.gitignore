@@ -1,0 +1,6 @@
+*
+!.gitignore
+!Makefile
+!install-run.sh
+!log.sh
+!clean.sh
