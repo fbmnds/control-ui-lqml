@@ -93,52 +93,11 @@ Item {
    	    color: "lavender"
 
 
-            Canvas
-            {
-                width: parent.width
-                height: parent.width
-                onPaint:
-                {
-                    var x = parent.width / 2
-                    var y = parent.height / 2
-                    var radius = 70;
-                    var startangle = -90
-                    var endangle = 30
-                    var context = getContext("2d");
-                    for(var j=0; j < 3; j++)
-                    {
-                        context.beginPath();
-                        context.moveTo(x, y);
-                        context.arc(x, y, radius, (startangle)*(Math.PI/180), (endangle)*(Math.PI/180), false) //x, y, radius, startAngle, endAngle, anticlockwise
-                        context.fillStyle = "lightblue"
-                        context.fill();
-                        startangle += 120
-                        endangle += 120
-                        context.closePath();
-                    }
-                }
+            Image {
+                id: svg
+                anchors.centerIn: parent
+                source: "svg/simple-example2.svg"
             }
-            //
-
-            
-            
-            //                    ChartView {
-            //                        title: "Line"
-            //                        anchors.fill: parent
-            //                        antialiasing: false
-            //
-            //
-            //                        LineSeries {
-            //                            name: "LineSeries"
-            //                            XYPoint { x: 0; y: 0 }
-            //                            XYPoint { x: 1.1; y: 2.1 }
-            //                            XYPoint { x: 1.9; y: 3.3 }
-            //                            XYPoint { x: 2.1; y: 2.1 }
-            //                            XYPoint { x: 2.9; y: 4.9 }
-            //                            XYPoint { x: 3.4; y: 3.0 }
-            //                            XYPoint { x: 4.1; y: 3.3 }
-            //                        }
-            //                    }
 	}
     }
 }

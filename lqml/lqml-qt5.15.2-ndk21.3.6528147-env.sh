@@ -11,3 +11,5 @@ export ECL_ANDROID_32=/home/dev/ecl/android/32bit/ecl-android
 alias qmake=/home/dev/Qt/5.15.2/gcc_64/bin/qmake
 alias qmake-android=/home/dev/Qt/5.15.2/android/bin/qmake
 alias qmake-android32='/home/dev/Qt/5.15.2/android/bin/qmake "CONFIG+=32bit"'
+alias rebuild32='touch ../app.asd && make clean && qmake-android32 .. && make apk && ./install-run.sh && ./log.sh'
+alias qmlscene='~/Qt/5.15.2/gcc_64/bin/qmlscene'
