@@ -58,8 +58,6 @@ Item {
             onPressed: Lisp.call(this, "app:button-pressed")
       	}
         
-
-
 	Rectangle {
 	    id: rect2
    	    width: parent.width
@@ -93,16 +91,10 @@ Item {
    	    height: 200
    	    color: "lavender"
 
-            property string src: ""
-            
             Image {
                 id: svg
                 anchors.centerIn: parent
-                source: src
-
-                property string src: "data:image/svg+xml;utf8,<svg version=\"1.1\" width=\"300\" height=\"200\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"lavender\" /><circle cx=\"150\" cy=\"100\" r=\"80\" fill=\"lightgrey\" /><text x=\"150\" y=\"125\" font-size=\"60\" text-anchor=\"middle\" fill=\"red\">SVG</text></svg>"
-                
-                property string src2: "data:image/svg+xml;utf8,<svg version=\"1.1\" width=\"300\" height=\"200\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"lavender\" /><circle cx=\"150\" cy=\"100\" r=\"80\" fill=\"lightgrey\" /><text x=\"150\" y=\"125\" font-size=\"60\" text-anchor=\"middle\" fill=\"green\">SVG</text></svg>"
+                source: "data:image/svg+xml;utf8,<svg version=\"1.1\" width=\"300\" height=\"200\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"lavender\" /><circle cx=\"150\" cy=\"100\" r=\"80\" fill=\"lightgrey\" /><text x=\"150\" y=\"125\" font-size=\"60\" text-anchor=\"middle\" fill=\"red\">SVG</text></svg>"
             }
 	}
     }

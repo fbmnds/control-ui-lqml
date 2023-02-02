@@ -10,11 +10,9 @@
       (progn (setf img 0) (values *svg2*)))))
 
 (defun update-status (text color)
-  (let ((img (img)))
-    (qlog img)
-    ;;(q> |src| ui:*svg* img)
-    (qjs |set| ui:*button* color img)
-    (q> |text| ui:*button* text)))
+  (qjs |set| ui:*button* color (img))
+  (q> |text| ui:*button* text)
+  (qsleep 1))
 
 (defun set-status (status)                                 
   (qlog (format nil "status ~A ~A" (local-time:now) status))
@@ -27,12 +25,10 @@
 
 (defun button-pressed ()
   (update-status "Werkstattlicht ..." "lightyellow")
-  (qsleep 1)
   (ignore-errors (set-status (curl "http://192.168.178.11/r1")))
   (values))                               
 
 (defun werkstattlicht ()  
   (update-status "Werkstattlicht ..." "lightyellow")
-  (qsleep 1)
   (ignore-errors (set-status (curl "http://192.168.178.11/?")))
   (values))
