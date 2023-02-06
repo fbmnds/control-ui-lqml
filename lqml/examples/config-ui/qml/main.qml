@@ -52,7 +52,11 @@ Item {
        		repeat: true
        		running: true
        		triggeredOnStart: true
-       		onTriggered: Lisp.call(this, "app:werkstattlicht")
+                function run () {
+                    Lisp.call(this, "app:set-svg");
+                    Lisp.call(this, "app:werkstattlicht")
+                }
+       		onTriggered: run()
    	    }
 	    
             onPressed: Lisp.call(this, "app:button-pressed")
@@ -94,7 +98,7 @@ Item {
             Image {
                 id: svg
                 anchors.centerIn: parent
-                source: "data:image/svg+xml;utf8,<svg version=\"1.1\" width=\"300\" height=\"200\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"lavender\" /><circle cx=\"150\" cy=\"100\" r=\"80\" fill=\"lightgrey\" /><text x=\"150\" y=\"125\" font-size=\"60\" text-anchor=\"middle\" fill=\"red\">SVG</text></svg>"
+                source: "svg/simple-sample2.svg"
             }
 	}
     }
