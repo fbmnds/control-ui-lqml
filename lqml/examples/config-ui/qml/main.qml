@@ -48,7 +48,7 @@ Item {
 
 	    Timer {
        		id: textTimer1
-       		interval: 15000
+       		interval: 150000
        		repeat: true
        		running: true
        		triggeredOnStart: true
