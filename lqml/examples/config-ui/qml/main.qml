@@ -10,21 +10,6 @@ Item {
     width: Screen.width
     height: Screen.height
 
-    WebSocketServer {
-        id: socket
-        host: "127.0.0.1"
-        port: 7700
-        listen: true
-
-        onClientConnected: {
-            webSocket.onTextMessageReceived.connect(
-                function (svg) {
-                    console.log(svg);
-                    //svg.source = "data:image/svg+xml;utf8," + svg;
-                });
-        }
-    }
-
     Column {
         id: column
         spacing: 10
@@ -117,5 +102,50 @@ Item {
                 source: "svg/simple-example2.svg"
             }
 	}
+
+
+
+
+
+        Rectangle {
+            id: wrect
+    width: parent.width
+    height: 360
+    color: "lightgreen"
+
+    function appendMessage(message) {
+        messageBox.text += "\n" + message
+    }
+    
+
+
+          Text {
+       		id: messageBox
+       		font.pointSize: 12
+       		anchors.verticalCenter: parent.verticalCenter
+       		anchors.horizontalCenter: parent.horizontalCenter
+       	      text: "Waiting..."
+   	    }
+
+        
+    WebSocketServer {
+        id: server
+        host: "192.168.178.31"
+        port: 7700
+        //url: "ws://192.168.178.31:7700/"
+        listen: true
+        onClientConnected: {
+            webSocket.onTextMessageReceived.connect(function(message) {
+                wrect.appendMessage(qsTr("Server received message: %1").arg(message));
+                //webSocket.sendTextMessage(qsTr("Hello Client!"));
+            });
+        }
+        onErrorStringChanged: {
+            wrect.appendMessage(qsTr("Server error: %1").arg(errorString));
+        }
+    }
+
+}
+        
     }
 }

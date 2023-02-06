@@ -346,6 +346,7 @@ compiler_rcc_clean:
 	-$(DEL_FILE) armeabi-v7a/qrc_qmake_qmake_immediate.cpp
 armeabi-v7a/qrc_qmake_qmake_immediate.cpp: armeabi-v7a/qmake_qmake_immediate.qrc \
 		/home/dev/Qt/5.15.2/android/bin/rcc \
+		../qml/test.qml \
 		../qml/main.qml \
 		../qml/svg/simple-example2.svg
 	/home/dev/Qt/5.15.2/android/bin/rcc -name qmake_qmake_immediate armeabi-v7a/qmake_qmake_immediate.qrc -o armeabi-v7a/qrc_qmake_qmake_immediate.cpp
