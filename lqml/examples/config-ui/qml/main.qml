@@ -2,12 +2,28 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
 import QtCharts 2.0
+import QtWebSockets 1.0
 
 Item {
     id: main
     objectName: "main"
     width: Screen.width
     height: Screen.height
+
+    WebSocketServer {
+        id: socket
+        host: "127.0.0.1"
+        port: 7700
+        listen: true
+
+        onClientConnected: {
+            webSocket.onTextMessageReceived.connect(
+                function (svg) {
+                    console.log(svg);
+                    //svg.source = "data:image/svg+xml;utf8," + svg;
+                });
+        }
+    }
 
     Column {
         id: column
@@ -38,7 +54,7 @@ Item {
 
             function set (clr, src) {
                 background.color = clr
-                svg.source = src
+                //svg.source = src
             }
             
             background: Rectangle {
@@ -53,7 +69,7 @@ Item {
        		running: true
        		triggeredOnStart: true
                 function run () {
-                    Lisp.call(this, "app:set-svg");
+                    //Lisp.call(this, "app:set-svg");
                     Lisp.call(this, "app:werkstattlicht")
                 }
        		onTriggered: run()
@@ -98,7 +114,7 @@ Item {
             Image {
                 id: svg
                 anchors.centerIn: parent
-                source: "svg/simple-sample2.svg"
+                source: "svg/simple-example2.svg"
             }
 	}
     }

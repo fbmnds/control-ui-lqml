@@ -27,16 +27,18 @@ QMAKE_EXTRA_COMPILERS += lisp
 win32:  PRE_TARGETDEPS = tmp/app.lib
 !win32: PRE_TARGETDEPS = tmp/libapp.a
 
-QT          += quick qml svg
+QT          += quick qml svg network websockets
 TEMPLATE    = app
 CONFIG      += c++17 no_keywords release
 DEFINES     = DESKTOP_APP INI_LISP INI_ECL_CONTRIB
 INCLUDEPATH = /usr/local/include
 ECL_VERSION = $$lower($$system(ecl -v))
 ECL_VERSION = $$replace(ECL_VERSION, " ", "-")
-LIBS        = -L/usr/local/lib -lecl
+LIBS        = -L$$ECL/lib -lecl
 LIBS        += -L/usr/local/lib/$$ECL_VERSION
 LIBS        += -lecl-help -ldeflate -lecl-cdb -lecl-curl -lql-minitar -lsockets
+LIBS        += -L../../../platforms/android/lib
+
 DESTDIR     = .
 TARGET      = app
 OBJECTS_DIR = tmp

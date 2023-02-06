@@ -1,5 +1,9 @@
 (in-package :app)
 
+(ensure-permissions :internet)
+(ensure-permissions :write-external-storage)
+(ensure-permissions :access-network-state)
+
 (defvar *svg-server* "http://192.168.178.8:7700/svg")
 (defvar *werkstatt-licht* "http://192.168.178.11/?")
 
@@ -16,7 +20,7 @@
   (values *svg*))
 
 (defun update-status (text color)
-  (qjs |set| ui:*button* color (img))
+  ;;(qjs |set| ui:*button* color (img))
   (q> |text| ui:*button* text)
   (qsleep 1))
 
