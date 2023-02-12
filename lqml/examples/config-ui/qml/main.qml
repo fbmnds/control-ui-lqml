@@ -53,7 +53,6 @@ Item {
        		running: true
        		triggeredOnStart: true
                 function run () {
-                    //Lisp.call(this, "app:set-svg");
                     Lisp.call(this, "app:werkstattlicht")
                 }
        		onTriggered: run()
@@ -97,14 +96,20 @@ Item {
 
             WebSocketServer {
                 id: server
-                //host: "192.168.178.31"
                 host: "0.0.0.0"
                 port: 7700
                 listen: true
+                
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
-                        svg.source = "data:image/svg+xml;utf8," + src;
-                        //webSocket.sendTextMessage(qsTr("Hello Client!"));
+                        var jsrc = JSON.parse(src);
+                        if (jsrc.tag == "svg") {
+                            console.log(src);
+                            svg.source = "data:image/svg+xml;utf8," + jsrc.svg;
+                        } else {
+                            console.log(src);
+                            wrect.appendMessage(jsrc.tag);
+                        }
                     });
                 }
                 onErrorStringChanged: {
@@ -122,8 +127,8 @@ Item {
         Rectangle {
             id: wrect
             width: parent.width
-            height: 360
-            color: "lightgreen"
+            height: 260
+            color: "lavender"
 
             function appendMessage(message) {
                 messageBox.text += "\n" + message
