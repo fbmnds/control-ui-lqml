@@ -97,7 +97,8 @@ Item {
 
             WebSocketServer {
                 id: server
-                host: "192.168.178.31"
+                //host: "192.168.178.31"
+                host: "0.0.0.0"
                 port: 7700
                 listen: true
                 onClientConnected: {
