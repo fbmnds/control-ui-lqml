@@ -13,4 +13,4 @@
 (defparameter *label* "label")
 (defparameter *button* "button")
 (defparameter *rect3* "rect3")
-(defparameter *rect3* "rect3")
+(defparameter *column* "column")

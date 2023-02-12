@@ -37,9 +37,8 @@ Item {
       	    
             text: "Licht"
 
-            function set (clr, src) {
+            function set (clr) {
                 background.color = clr
-                //svg.source = src
             }
             
             background: Rectangle {
@@ -96,6 +95,22 @@ Item {
    	    height: 200
    	    color: "lavender"
 
+            WebSocketServer {
+                id: server
+                host: "192.168.178.31"
+                port: 7700
+                listen: true
+                onClientConnected: {
+                    webSocket.onTextMessageReceived.connect(function(src) {
+                        svg.source = "data:image/svg+xml;utf8," + src;
+                        //webSocket.sendTextMessage(qsTr("Hello Client!"));
+                    });
+                }
+                onErrorStringChanged: {
+                    svg.source = "svg/simple-example2.svg";
+                }
+            }
+
             Image {
                 id: svg
                 anchors.centerIn: parent
@@ -103,49 +118,26 @@ Item {
             }
 	}
 
-
-
-
-
         Rectangle {
             id: wrect
-    width: parent.width
-    height: 360
-    color: "lightgreen"
+            width: parent.width
+            height: 360
+            color: "lightgreen"
 
-    function appendMessage(message) {
-        messageBox.text += "\n" + message
-    }
-    
+            function appendMessage(message) {
+                messageBox.text += "\n" + message
+            }
 
-
-          Text {
+            Text {
        		id: messageBox
        		font.pointSize: 12
        		anchors.verticalCenter: parent.verticalCenter
        		anchors.horizontalCenter: parent.horizontalCenter
-       	      text: "Waiting..."
+       	        text: "Waiting..."
    	    }
+            
 
-        
-    WebSocketServer {
-        id: server
-        host: "192.168.178.31"
-        port: 7700
-        //url: "ws://192.168.178.31:7700/"
-        listen: true
-        onClientConnected: {
-            webSocket.onTextMessageReceived.connect(function(message) {
-                wrect.appendMessage(qsTr("Server received message: %1").arg(message));
-                //webSocket.sendTextMessage(qsTr("Hello Client!"));
-            });
         }
-        onErrorStringChanged: {
-            wrect.appendMessage(qsTr("Server error: %1").arg(errorString));
-        }
-    }
-
-}
         
     }
 }

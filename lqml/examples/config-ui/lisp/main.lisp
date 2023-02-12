@@ -5,7 +5,7 @@
 (ensure-permissions :access-network-state)
 
 (defvar *svg-server* "http://192.168.178.8:7700/svg")
-(defvar *werkstatt-licht* "http://192.168.178.11/?")
+(defvar *werkstatt-licht* "http://192.168.178.11")
 
 (defvar *svg2* (str+ "data:image/svg+xml;utf8,"
                      "<svg version=\"1.1\" width=\"300\" height=\"200\""
@@ -20,7 +20,7 @@
   (values *svg*))
 
 (defun update-status (text color)
-  ;;(qjs |set| ui:*button* color (img))
+  (qjs |set| ui:*button* color)
   (q> |text| ui:*button* text)
   (qsleep 1))
 
@@ -35,12 +35,12 @@
 
 (defun button-pressed ()
   (update-status "Werkstattlicht ..." "lightyellow")
-  (ignore-errors (set-status (curl "http://192.168.178.11/r1")))
+  (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/r1"))))
   (values))                               
 
 (defun werkstattlicht ()  
   (update-status "Werkstattlicht ..." "lightyellow")
-  (ignore-errors (set-status (curl *werkstatt-licht*)))
+  (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/?"))))
   (values))
 
 (let ((w (format nil "~a" (q< |width| ui:*main*)))
