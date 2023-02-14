@@ -1,7 +1,6 @@
 
 (defpackage :app
-  (:use :cl :qml ;;:cl-svg :parse-float
-        )
+  (:use :cl :qml :cl-svg :parse-float)
   (:local-nicknames (#:lt #:local-time)
                     ;;(#:ws #:websocket-driver)
                     ;;(#:wsd #:websocket-driver-client)
