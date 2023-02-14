@@ -16,7 +16,7 @@ CXX           = /opt/android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux
 DEFINES       = -DINI_LISP -DINI_ECL_CONTRIB -DQT_NO_DEBUG -DQT_NO_KEYWORDS -DQT_QUICK_LIB -DQT_SVG_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_QMLMODELS_LIB -DQT_QML_LIB -DQT_WEBSOCKETS_LIB -DQT_NETWORK_LIB -DQT_ANDROIDEXTRAS_LIB -DQT_CORE_LIB
 CFLAGS        = -target armv7a-linux-androideabi21 -fno-limit-debug-info -fPIC -fstack-protector-strong -DANDROID -O2 -mthumb -Oz -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -target armv7a-linux-androideabi21 -fno-limit-debug-info -fPIC -fstack-protector-strong -DANDROID -O2 -mthumb -Oz -std=gnu++1z -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../../config-ui -I. -I/home/dev/ecl/android/32bit/ecl-android/include -I/home/dev/Qt/5.15.2/android/include -I/home/dev/Qt/5.15.2/android/include/QtQuick -I/home/dev/Qt/5.15.2/android/include/QtSvg -I/home/dev/Qt/5.15.2/android/include/QtWidgets -I/home/dev/Qt/5.15.2/android/include/QtGui -I/home/dev/Qt/5.15.2/android/include/QtQmlModels -I/home/dev/Qt/5.15.2/android/include/QtQml -I/home/dev/Qt/5.15.2/android/include/QtWebSockets -I/home/dev/Qt/5.15.2/android/include/QtNetwork -I/home/dev/Qt/5.15.2/android/include/QtAndroidExtras -I/home/dev/Qt/5.15.2/android/include/QtCore -Itmp -I/home/dev/Qt/5.15.2/android/mkspecs/android-clang
+INCPATH       = -I../../control-ui -I. -I/home/dev/ecl/android/32bit/ecl-android/include -I/home/dev/Qt/5.15.2/android/include -I/home/dev/Qt/5.15.2/android/include/QtQuick -I/home/dev/Qt/5.15.2/android/include/QtSvg -I/home/dev/Qt/5.15.2/android/include/QtWidgets -I/home/dev/Qt/5.15.2/android/include/QtGui -I/home/dev/Qt/5.15.2/android/include/QtQmlModels -I/home/dev/Qt/5.15.2/android/include/QtQml -I/home/dev/Qt/5.15.2/android/include/QtWebSockets -I/home/dev/Qt/5.15.2/android/include/QtNetwork -I/home/dev/Qt/5.15.2/android/include/QtAndroidExtras -I/home/dev/Qt/5.15.2/android/include/QtCore -Itmp -I/home/dev/Qt/5.15.2/android/mkspecs/android-clang
 QMAKE         = /home/dev/Qt/5.15.2/android/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -36,7 +36,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = libapp_armeabi-v7a.so1.0.0
-DISTDIR = /home/dev/control-ui-lqml/lqml/apps/config-ui/build-android/tmp/libapp_armeabi-v7a.so1.0.0
+DISTDIR = /home/dev/control-ui-lqml/lqml/apps/control-ui/build-android/tmp/libapp_armeabi-v7a.so1.0.0
 LINK          = /opt/android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ -target armv7a-linux-androideabi21 -fno-limit-debug-info
 LFLAGS        = -Wl,-soname,libapp_armeabi-v7a.so -Wl,--build-id=sha1 -Wl,--no-undefined -Wl,-z,noexecstack -shared
 LIBS          = $(SUBLIBS) -L/home/dev/ecl/android/32bit/ecl-android/lib -lecl -L/home/dev/ecl/android/32bit/ecl-android/lib/ecl-21.2.1 -lecl-help -ldeflate -lecl-cdb -lecl-curl -lql-minitar -lsockets -L../../../platforms/android/lib -llqml32 -llisp32 -Ltmp -lapp /home/dev/Qt/5.15.2/android/lib/libQt5Quick_armeabi-v7a.so /home/dev/Qt/5.15.2/android/lib/libQt5Svg_armeabi-v7a.so /home/dev/Qt/5.15.2/android/lib/libQt5Widgets_armeabi-v7a.so /home/dev/Qt/5.15.2/android/lib/libQt5Gui_armeabi-v7a.so /home/dev/Qt/5.15.2/android/lib/libQt5QmlModels_armeabi-v7a.so /home/dev/Qt/5.15.2/android/lib/libQt5Qml_armeabi-v7a.so /home/dev/Qt/5.15.2/android/lib/libQt5WebSockets_armeabi-v7a.so /home/dev/Qt/5.15.2/android/lib/libQt5Network_armeabi-v7a.so /home/dev/Qt/5.15.2/android/lib/libQt5AndroidExtras_armeabi-v7a.so /home/dev/Qt/5.15.2/android/lib/libQt5Core_armeabi-v7a.so -lGLESv2   -llog -lz -lm -ldl -lc
@@ -295,13 +295,13 @@ distclean: clean
 ####### Sub-libraries
 
 aab: apk_install_target
-	/home/dev/Qt/5.15.2/android/bin/androiddeployqt --input /home/dev/control-ui-lqml/lqml/apps/config-ui/build-android/android-app-deployment-settings.json --output /home/dev/control-ui-lqml/lqml/apps/config-ui/build-android/android-build --aab --apk /home/dev/control-ui-lqml/lqml/apps/config-ui/build-android/android-build/app.apk
+	/home/dev/Qt/5.15.2/android/bin/androiddeployqt --input /home/dev/control-ui-lqml/lqml/apps/control-ui/build-android/android-app-deployment-settings.json --output /home/dev/control-ui-lqml/lqml/apps/control-ui/build-android/android-build --aab --apk /home/dev/control-ui-lqml/lqml/apps/control-ui/build-android/android-build/app.apk
 
 apk: apk_install_target
-	/home/dev/Qt/5.15.2/android/bin/androiddeployqt --input /home/dev/control-ui-lqml/lqml/apps/config-ui/build-android/android-app-deployment-settings.json --output /home/dev/control-ui-lqml/lqml/apps/config-ui/build-android/android-build --apk /home/dev/control-ui-lqml/lqml/apps/config-ui/build-android/android-build/app.apk
+	/home/dev/Qt/5.15.2/android/bin/androiddeployqt --input /home/dev/control-ui-lqml/lqml/apps/control-ui/build-android/android-app-deployment-settings.json --output /home/dev/control-ui-lqml/lqml/apps/control-ui/build-android/android-build --apk /home/dev/control-ui-lqml/lqml/apps/control-ui/build-android/android-build/app.apk
 
 apk_install_target: first
-	$(MAKE) -f $(MAKEFILE) INSTALL_ROOT=/home/dev/control-ui-lqml/lqml/apps/config-ui/build-android/android-build install
+	$(MAKE) -f $(MAKEFILE) INSTALL_ROOT=/home/dev/control-ui-lqml/lqml/apps/control-ui/build-android/android-build install
 
 mocclean: compiler_moc_header_clean compiler_moc_objc_header_clean compiler_moc_source_clean
 
@@ -315,31 +315,31 @@ compiler_lisp_make_all: tmp/libapp.a tmp/libapp.a tmp/libapp.a tmp/libapp.a tmp/
 compiler_lisp_clean:
 	-$(DEL_FILE) tmp/libapp.a
 tmp/libapp.a: ../lisp/curl.lisp
-	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/config-ui/make.lisp
+	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui/make.lisp
 
 tmp/libapp.a: ../lisp/main.lisp
-	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/config-ui/make.lisp
+	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui/make.lisp
 
 tmp/libapp.a: ../lisp/package.lisp
-	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/config-ui/make.lisp
+	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui/make.lisp
 
 tmp/libapp.a: ../lisp/qml-reload
-	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/config-ui/make.lisp
+	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui/make.lisp
 
 tmp/libapp.a: ../lisp/svg
-	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/config-ui/make.lisp
+	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui/make.lisp
 
 tmp/libapp.a: ../lisp/ui-vars.lisp
-	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/config-ui/make.lisp
+	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui/make.lisp
 
 tmp/libapp.a: ../lisp/utils.lisp
-	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/config-ui/make.lisp
+	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui/make.lisp
 
 tmp/libapp.a: ../app.asd
-	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/config-ui/make.lisp
+	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui/make.lisp
 
 tmp/libapp.a: ../make.lisp
-	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/config-ui/make.lisp
+	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui/make.lisp
 
 compiler_rcc_make_all: armeabi-v7a/qrc_qmake_qmake_immediate.cpp
 compiler_rcc_clean:
@@ -467,7 +467,7 @@ tmp/moc_main.cpp: ../../../src/cpp/main.h \
 		/home/dev/Qt/5.15.2/android/include/QtGui/qtouchdevice.h \
 		tmp/moc_predefs.h \
 		/home/dev/Qt/5.15.2/android/bin/moc
-	/home/dev/Qt/5.15.2/android/bin/moc $(DEFINES) --include /home/dev/control-ui-lqml/lqml/apps/config-ui/build-android/tmp/moc_predefs.h -I/home/dev/Qt/5.15.2/android/mkspecs/android-clang -I/home/dev/control-ui-lqml/lqml/apps/config-ui -I/home/dev/ecl/android/32bit/ecl-android/include -I/home/dev/Qt/5.15.2/android/include -I/home/dev/Qt/5.15.2/android/include/QtQuick -I/home/dev/Qt/5.15.2/android/include/QtSvg -I/home/dev/Qt/5.15.2/android/include/QtWidgets -I/home/dev/Qt/5.15.2/android/include/QtGui -I/home/dev/Qt/5.15.2/android/include/QtQmlModels -I/home/dev/Qt/5.15.2/android/include/QtQml -I/home/dev/Qt/5.15.2/android/include/QtWebSockets -I/home/dev/Qt/5.15.2/android/include/QtNetwork -I/home/dev/Qt/5.15.2/android/include/QtAndroidExtras -I/home/dev/Qt/5.15.2/android/include/QtCore -I. -I/usr/local/include -I/home/dev/Android/Sdk/ndk/android-ndk-r10e/toolchains/llvm-3.6/prebuilt/linux-x86_64/lib/clang/3.6/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../../src/cpp/main.h -o tmp/moc_main.cpp
+	/home/dev/Qt/5.15.2/android/bin/moc $(DEFINES) --include /home/dev/control-ui-lqml/lqml/apps/control-ui/build-android/tmp/moc_predefs.h -I/home/dev/Qt/5.15.2/android/mkspecs/android-clang -I/home/dev/control-ui-lqml/lqml/apps/control-ui -I/home/dev/ecl/android/32bit/ecl-android/include -I/home/dev/Qt/5.15.2/android/include -I/home/dev/Qt/5.15.2/android/include/QtQuick -I/home/dev/Qt/5.15.2/android/include/QtSvg -I/home/dev/Qt/5.15.2/android/include/QtWidgets -I/home/dev/Qt/5.15.2/android/include/QtGui -I/home/dev/Qt/5.15.2/android/include/QtQmlModels -I/home/dev/Qt/5.15.2/android/include/QtQml -I/home/dev/Qt/5.15.2/android/include/QtWebSockets -I/home/dev/Qt/5.15.2/android/include/QtNetwork -I/home/dev/Qt/5.15.2/android/include/QtAndroidExtras -I/home/dev/Qt/5.15.2/android/include/QtCore -I. -I/usr/local/include -I/home/dev/Android/Sdk/ndk/android-ndk-r10e/toolchains/llvm-3.6/prebuilt/linux-x86_64/lib/clang/3.6/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../../src/cpp/main.h -o tmp/moc_main.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
