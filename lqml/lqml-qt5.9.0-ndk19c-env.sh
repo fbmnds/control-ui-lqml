@@ -13,3 +13,4 @@ alias qmake-android=/home/dev/Qt5.9.0/5.9/android_armv7/bin/qmake
 alias qmake-android32='/home/dev/Qt5.9.0/5.9/android_armv7/bin/qmake "CONFIG+=32bit"'
 alias rebuild32='touch ../app.asd && make clean && qmake-android32 .. && make apk && ./install-run.sh && ./log.sh'
 alias qmlscene='~/Qt/5.15.2/gcc_64/bin/qmlscene'
+alias rebuild32='touch ../app.asd && make clean && qmake-android32 .. && make apk && ./install-run.sh && ./log.sh'
