@@ -102,13 +102,17 @@ Item {
                 
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
-                        var jsrc = JSON.parse(src);
-                        if (jsrc.tag == "svg") {
-                            console.log(src);
-                            svg.source = "data:image/svg+xml;utf8," + jsrc.svg;
+                        if (src.startsWith("<?xml")) {
+                            svg.source = "data:image/svg+xml;utf8," + src;
                         } else {
-                            console.log(src);
-                            wrect.appendMessage(jsrc.tag);
+                            let jsrc = JSON.parse(src);
+                            if (jsrc.tag == "svg") {
+                                console.log(src);
+                                svg.source = "data:image/svg+xml;utf8," + jsrc.svg;
+                            } else {
+                                console.log(src);
+                                wrect.appendMessage(jsrc.tag);
+                            }
                         }
                     });
                 }
