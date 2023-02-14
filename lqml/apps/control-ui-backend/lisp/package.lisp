@@ -11,7 +11,9 @@
   (:export    #:button-pressed
               #:set-svg
               #:werkstattlicht
-              ;;#:generate-svg
+              #:receive-data
+              #:generate-svg
+              #:set-svg
               ))
 
 

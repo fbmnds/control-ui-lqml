@@ -59,12 +59,12 @@
   (setf *y2* nil)
   (setf *x* nil))
 
-(defun set-input-parameter (&optional
-                              (width 300) (n 10)
-                              (height 200) (m 10)
-                              (left-right-margin 22)
-                              (bottom-margin 14)
-                              (lbl-width 60))
+(defun set-input-parameter (&key
+                            (width 300) (n 10)
+                            (height 200) (m 10)
+                            (left-right-margin 22)
+                            (bottom-margin 14)
+                            (lbl-width 60))
   (assert (< 200 width))
   (assert (< 100 height))
   (assert (< m height))
@@ -90,7 +90,13 @@
     (when (< v (1- n))
       (mapcar (lambda (x) (+ x (- n v 1))) idx))))
 
-(defun prepare-data (data)
+(defun receive-data (data &optional (n *n*) (w *w*))
+  (let ((idx (when (< w n) (select-index n w)))
+        (data (yason:parse data)))
+    (when idx (setf data (loop for i in idx collect (nth i data))))
+    (setf *data* data)))
+
+(defun prepare-data (&key (data *data*))
   (assert data)
   (setf *n* (length data))
   (setf *temp* (make-array *n* :element-type 'float))
@@ -120,7 +126,7 @@
                       *max-ts* max-ts
                       *min-ts* min-ts)))
 
-(defun fetch-data (&optional
+(defun fetch-data (&key
                      (n *n*) (w *w*)
                      (database *database*))
   (let* ((idx (when (< w n) (select-index n w)))
@@ -133,10 +139,9 @@
                (format nil " desc limit ~a;'" n)))
          (data (uiop:run-program cmd :force-shell t
                                      :output '(:string :stripped t)))
-         
          (data (yason:parse data)))
     (when idx (setf data (loop for i in idx collect (nth i data))))
-    (prepare-data data)))
+    (setf *data* data)))
 
 (defun set-parameter (&optional
                         (min-temp *min-temp*)
@@ -188,8 +193,7 @@
 (defmacro make-strings (m)
   `(make-array ,m :element-type 'string :initial-element ""))
 
-
-(defun transform-data (&optional
+(defun transform-data (&key
                          (h *h*) (w *w*) (n *n*)
                          (left-right-margin *left-right-margin*)
                          (bottom-margin *bottom-margin*)
@@ -251,15 +255,15 @@
             (lt:timestamp-hour ts)
             (lt:timestamp-minute ts))))
 
-(defun draw-svg (&optional
-                   output
-                   (h *h*) (w *w*) (n *n*) (m *m*)
-                   (left-right-margin *left-right-margin*)
-                   (bottom-margin *bottom-margin*)
-                   (lbl-width *lbl-width*)
-                   (dh-temp *dh-temp*) (min-temp *min-temp*)
-                   (dh-hum *dh-hum*) (min-hum *min-hum*)
-                   (arr-x *x*) (arr-y1 *y1*) (arr-y2 *y2*) (arr-ts *ts*))
+(defun draw-svg (&key
+                 (output :string)
+                 (h *h*) (w *w*) (n *n*) (m *m*)
+                 (left-right-margin *left-right-margin*)
+                 (bottom-margin *bottom-margin*)
+                 (lbl-width *lbl-width*)
+                 (dh-temp *dh-temp*) (min-temp *min-temp*)
+                 (dh-hum *dh-hum*) (min-hum *min-hum*)
+                 (arr-x *x*) (arr-y1 *y1*) (arr-y2 *y2*) (arr-ts *ts*))
   (let* ((scene (make-svg-toplevel 'svg-1.1-toplevel :height h :width w))
          (lm (format nil "~a" left-right-margin))
          (h-bm (- h bottom-margin))
@@ -274,55 +278,58 @@
           while (< i m)
           do (draw-polyline (fmt10 (* %di h-bm)) w-lm-s)
              (text scene
-                 (:x 1 :y (* (- 1 %di) h-bm) :font-size 10 :fill "green")
-               (fmt10 (+ min-temp (* %di dh-temp))))
+                   (:x 1 :y (* (- 1 %di) h-bm) :font-size 10 :fill "green")
+                   (fmt10 (+ min-hum (* %di dh-hum))))
              (text scene
-                 (:x (- w-lm -1) :y (* (- 1 %di) h-bm)
-                  :font-size 10 :fill "blue")
-               (fmt10 (+ min-hum (* %di dh-hum)))))
-     
-    (draw scene (:polyline :points (points arr-x arr-y1))
-          :stroke "green" :stroke-width 1 :fill "none")
+                   (:x (- w-lm -1) :y (* (- 1 %di) h-bm)
+                       :font-size 10 :fill "blue")
+                   (fmt10 (+ min-temp (* %di dh-temp)))))
+
     (draw scene (:polyline :points (points arr-x arr-y2))
+          :stroke "lightgreen" :stroke-width 1 :fill "none")
+    (draw scene (:polyline :points (points arr-x arr-y1))
           :stroke "blue" :stroke-width 1 :fill "none")
-    (draw scene (:polyline :points (str+ lm ",0 " lm "," h-bm-s))
-          :stroke "green" :stroke-width 1 :fill "none")
     (draw scene (:polyline :points (str+ lm "," h-bm-s " " w-lm-s "," h-bm-s))
           :stroke "black" :stroke-width 1 :fill "none")
-    (draw scene (:polyline :points (str+ w-lm-s ",0 " w-lm-s "," h-bm-s))
+    (draw scene (:polyline :points (str+ lm ",0 " lm "," h-bm-s))
           :stroke "blue" :stroke-width 1 :fill "none")
+    (draw scene (:polyline :points (str+ w-lm-s ",0 " w-lm-s "," h-bm-s))
+          :stroke "green" :stroke-width 1 :fill "none")
 
     (let (idx
           (n2 (floor (/ w-lm lbl-width))))
       (if (< n2 n)
           (setf idx (select-index n n2))
-          (setf idx (loop for %i in idx while (< %i n) collect %i)))
+        (setf idx (loop for %i in idx while (< %i n) collect %i)))
       (loop for i in idx
             for x = (aref arr-x i)
             for y = (- h 3)
             for lb = (format-ts (aref arr-ts i))
             do (text scene
-                   (:x (- x 22) :y y :font-size 9 :fill "black") lb)
+                     (:x (- x 22) :y y :font-size 9 :fill "black") lb)
                (draw scene (:polyline
                             :points (str+ (fmt10 x) ",0 " (fmt10 x) "," h-bm-s))
                      :stroke "lightgrey" :stroke-width 1 :fill "none")))
-    
+
     (if (eql output :string)
         (with-output-to-string (s) (stream-out s scene))
-        (with-open-file (s *svg-file* :direction :output :if-exists :supersede)
-          (stream-out s scene)))))
+      (with-open-file (s output :direction :output :if-exists :supersede)
+                      (stream-out s scene)))))
 
-(defun generate-svg (&optional
-                       output
-                       (width 300) (n 200)
-                       (height 200) (m 10)
-                       (left-right-margin 22)
-                       (bottom-margin 14)
-                       (lbl-width 60))
+(defun generate-svg (&key
+                     (output :string)
+                     (data *data*)
+                     (width 300) (n 200)
+                     (height 200) (m 10)
+                     (left-right-margin 22)
+                     (bottom-margin 14)
+                     (lbl-width 60))
   (init-parameter)
-  (set-input-parameter
-   width n height m left-right-margin bottom-margin lbl-width)
-  (fetch-data)
+  (set-input-parameter :width width :n n :height height :m m
+                       :left-right-margin left-right-margin
+                       :bottom-margin bottom-margin
+                       :lbl-width lbl-width)
+  (prepare-data data)
   (set-parameter)
   (transform-data)
   (draw-svg output))

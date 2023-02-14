@@ -5,7 +5,10 @@
    #:*label*
    #:*button*
    #:*rect3*
-   #:*svg*))
+   #:*svg*
+   #:*column*
+   #:*wrect*
+   #:*wrect3*))
 
 (in-package :ui)
 
@@ -14,3 +17,5 @@
 (defparameter *button* "button")
 (defparameter *rect3* "rect3")
 (defparameter *column* "column")
+(defparameter *wrect* "wrect")
+(defparameter *wrect3* "wrect3")

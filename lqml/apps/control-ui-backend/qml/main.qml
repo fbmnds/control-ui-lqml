@@ -94,6 +94,11 @@ Item {
    	    height: 200
    	    color: "lavender"
 
+            property string svgText: ""
+            function setSvg (s) {
+                svg.source = "data:image/svg+xml;utf8," + s;
+            }
+
             WebSocketServer {
                 id: server
                 host: "0.0.0.0"
@@ -102,17 +107,20 @@ Item {
                 
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
-                        if (src.startsWith("<?xml")) {
+                        wrect.appendMessage("connected");
+                        wrect.appendMessage(src.substring(0,10));
+                        if (src.startsWith("<?xml"))
+                        {
+                            console.log(src);
                             svg.source = "data:image/svg+xml;utf8," + src;
-                        } else {
-                            let jsrc = JSON.parse(src);
-                            if (jsrc.tag == "svg") {
-                                console.log(src);
-                                svg.source = "data:image/svg+xml;utf8," + jsrc.svg;
-                            } else {
-                                console.log(src);
-                                wrect.appendMessage(jsrc.tag);
-                            }
+                        }
+                        else
+                        {
+                            wrect.appendMessage("set svgText");
+                            rect3.svgText = src;
+                            wrect.appendMessage("call set-svg");
+                            Lisp.call(this, "app:set-svg");
+                            wrect.appendMessage(done);
                         }
                     });
                 }

@@ -43,11 +43,31 @@
   (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/?"))))
   (values))
 
-(let ((w (format nil "~a" (q< |width| ui:*main*)))
-      (h (format nil "~a" (q< |height| ui:*main*)))
-      (n "800"))
+(let ((width (q< |width| ui:*main*))
+      (height (q< |height| ui:*main*))
+      (n 200)
+      (m 10)
+      (left-right-margin 24)
+      (bottom-margin 14)
+      (lbl-width 60))
   (defun set-svg ()
-    (let ((svg (ignore-errors (curl (x:cc *svg-server* "")))))
+    (qjs |appendMessage| ui:*wrect* "in set-svg")
+    (let* ((data (q< |svgText| ui:*wrect3*))
+           (svg (ignore-errors
+                 (set-input-parameter :width width :n n :height height :m m
+                                      :left-right-margin left-right-margin
+                                      :bottom-margin bottom-margin
+                                      :lbl-width lbl-width)
+                 (qjs |appendMessage| ui:*wrect* "prepare..")
+                 (prepare-data data)
+                 (qjs |appendMessage| ui:*wrect*  "set..")
+                 (set-parameter)
+                 (qjs |appendMessage| ui:*wrect*  "transform..")
+                 (transform-data)
+                 (qjs |appendMessage| ui:*wrect* "draw...")
+                 (draw-svg :string))))
+      (qjs |appendMessage| ui:*wrect* (format nil "data '~a'" data))
       (if svg
-          (setf *svg* (format nil "data:image/svg+xml;utf8,~a" svg))
-          (setf *svg* *svg2*)))))
+          (qjs |setSvg| ui:*rect3* svg)
+          (qjs |setSvg| ui:*rect3* *svg2*)))))
+
