@@ -1,4 +1,4 @@
-(defpackage ui
+(defpackage :ui
   (:use :cl :qml)
   (:export
    #:*main*
@@ -8,7 +8,7 @@
    #:*svg*
    #:*column*
    #:*wrect*
-   #:*wrect3*))
+   #:*msgbox*))
 
 (in-package :ui)
 
@@ -18,4 +18,4 @@
 (defparameter *rect3* "rect3")
 (defparameter *column* "column")
 (defparameter *wrect* "wrect")
-(defparameter *wrect3* "wrect3")
+(defparameter *msgbox* "msgbox")

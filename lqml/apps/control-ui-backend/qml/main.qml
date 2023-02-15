@@ -12,6 +12,7 @@ Item {
 
     Column {
         id: column
+        objectName: "column"
         spacing: 10
         width: parent.width
         height: parent.height
@@ -90,38 +91,36 @@ Item {
         
         Rectangle {
 	    id: rect3
+            objectName: "rect3"
    	    width: parent.width
    	    height: 200
    	    color: "lavender"
    	    
    	    property string svgText: ""
-   	    
+
+            function setSvgText (src) {
+                Lisp.call(this, "app:put-svg", src);
+                svgText = "from Lisp " + svgText;
+                wrect.appendMessage(svgText.substring(0,100));
+            }
+            
             WebSocketServer {
                 id: server
                 host: "0.0.0.0"
                 port: 7700
                 listen: true
                 
-                function putSvg (src) {                       
-                    wrect.appendMessage("set svgText");
-                    rect3.svgText = "in QML " + src;
-                    wrect.appendMessage("call set-svg");
-                	Lisp.call(this, "app:put-svg", src);
-                	wrect.appendMessage("from Lisp '" + rect3.svgText.substring(0,30) + "'");
-                }
-                
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
                         wrect.setMessage("connected");
-                        wrect.appendMessage(src.substring(0,10));
+                        wrect.appendMessage(src.substring(0,20));
                         if (src.startsWith("<?xml"))
                         {
-                            console.log(src);
                             svg.source = "data:image/svg+xml;utf8," + src;
                         }
                         else
                         {
-                            putSvg(src);
+                            rect3.setSvgText(src);
                         }
                     });
                 }
@@ -132,6 +131,7 @@ Item {
 
             Image {
                 id: svg
+                objectName: "svg"
                 anchors.centerIn: parent
                 source: "svg/simple-example2.svg"
             }
@@ -139,20 +139,22 @@ Item {
 
         Rectangle {
             id: wrect
+            objectName: "wrect"
             width: parent.width
             height: 260
             color: "lavender"
 
             function appendMessage(message) {
-                messageBox.text += "\n" + message
+                msgbox.text += "\n" + message
             }
 
             function setMessage(message) {
-                messageBox.text = "Waiting...\n" + message
+                msgbox.text = "Waiting...\n" + message
             }
 
             Text {
-       		id: messageBox
+       		id: msgbox
+       		objectName: "msgbox"
        		font.pointSize: 12
        		anchors.verticalCenter: parent.verticalCenter
        		anchors.horizontalCenter: parent.horizontalCenter
