@@ -95,7 +95,7 @@
         (data (yason:parse data)))
     (setf *data*
           (cond ((< n (length data)) (subseq data 0 n))
-                ((> n (length data)) data)
+                ((>= n (length data)) data)
                 ((consp idx) (loop for i in idx collect (nth i data)))
                 (t data)))))
 

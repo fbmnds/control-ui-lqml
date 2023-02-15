@@ -23,7 +23,7 @@
                      " text-anchor=\"middle\" fill=\"green\">SVG</text></svg>"))
 
 (defparameter *fetch-db-cmd*
-  (str+ "scp -i /home/dev/.ssh/bitbucket_rsa.pub"
+  (str+ "/usr/bin/scp -i /home/dev/.ssh/bitbucket_rsa.pub"
         " dev@192.168.178.32:~/projects/heating-control/data/heating.db"
         " /home/dev/projects/heating-control/data/heating.db"))
 
@@ -37,7 +37,7 @@
    (format nil " desc limit ~a;'" n)))
 
 (defun fetch-data (n)
-  (uiop:run-program *fetch-db-cmd*)
+  (uiop:run-program *fetch-db-cmd* :force-shell t)
   (uiop:run-program (select-data n) :force-shell t
                     :output '(:string :stripped t)))
 
