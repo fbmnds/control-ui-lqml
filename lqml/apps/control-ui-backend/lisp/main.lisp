@@ -57,7 +57,9 @@
     ;;(error "test")
     ;;(qlog "in set-svg")
     ;;(qjs |appendMessage| ui:*wrect* "in set-svg")
-  (q> |svgText| ui:*rect3* (format nil "in put-svg: " data))
+  (q> |svgText| ui:*rect3*
+      (format nil "in put-svg: "
+              (q< |svgText| ui:*rect3*)))
   #|
   (handler-case                         ;
   (let ((svn (progn (set-input-parameter :width width :n n :height height :m m ;

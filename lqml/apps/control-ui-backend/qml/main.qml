@@ -102,6 +102,14 @@ Item {
                 port: 7700
                 listen: true
                 
+                function putSvg (src) {                       
+                    wrect.appendMessage("set svgText");
+                    rect3.svgText = "in QML " + src;
+                    wrect.appendMessage("call set-svg");
+                	Lisp.call(this, "app:put-svg", src);
+                	wrect.appendMessage("from Lisp '" + rect3.svgText.substring(0,30) + "'");
+                }
+                
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
                         wrect.setMessage("connected");
@@ -113,11 +121,7 @@ Item {
                         }
                         else
                         {
-                            wrect.appendMessage("set svgText");
-                            rect3.svgText = src;
-                            wrect.appendMessage("call set-svg");
-                            Lisp.call(this, "app:put-svg", src);
-                            wrect.appendMessage("data '" + rect3.svgText.substring(0,30) + "'");
+                            putSvg(src);
                         }
                     });
                 }
