@@ -93,8 +93,11 @@
 (defun receive-data (data &optional (n *n*) (w *w*))
   (let ((idx (when (< w n) (select-index n w)))
         (data (yason:parse data)))
-    (when idx (setf data (loop for i in idx collect (nth i data))))
-    (setf *data* data)))
+    (setf *data*
+          (cond ((< n (length data)) (subseq data 0 n))
+                ((> n (length data)) data)
+                ((consp idx) (loop for i in idx collect (nth i data)))
+                (t data)))))
 
 (defun prepare-data (&key (data *data*))
   (assert data)

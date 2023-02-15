@@ -37,16 +37,16 @@
    (format nil " desc limit ~a;'" n)))
 
 (defun fetch-data (n)
-  ;;(uiop:run-program *fetch-db-cmd*)
+  (uiop:run-program *fetch-db-cmd*)
   (uiop:run-program (select-data n) :force-shell t
                     :output '(:string :stripped t)))
 
-(defun send-svg(url)
-  (let* ((data (fetch-data 10))
+(defun send-svg(url n)
+  (let* ((data (fetch-data n))
          (url (str+ "ws://" url ":7700/"))
          (client (wsd:make-client url)))
     (progn
-      (print data)
+      ;;(print data)
       ;;(ws:on :open client (lambda () (format t "~&connected~%")))
       (ws:start-connection client)
       (ws:on :message client (lambda (message) (format t "~a" message)))

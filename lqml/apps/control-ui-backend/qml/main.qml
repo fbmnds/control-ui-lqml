@@ -100,8 +100,9 @@ Item {
 
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
-                svgText = "from Lisp " + svgText;
-                wrect.appendMessage(svgText.substring(0,100));
+                svg.source = svgText;
+                //svgText = "from Lisp " + svgText;
+                //wrect.appendMessage(svgText.substring(0,100));
             }
             
             WebSocketServer {

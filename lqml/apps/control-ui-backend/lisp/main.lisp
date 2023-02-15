@@ -46,9 +46,9 @@
 
 (defun put-svg (data)
     (let ((svg "data:image/svg+xmlutf8,")
-          (width (q< |width| ui:*main*))
-      (height (q< |height| ui:*main*))
-      (n 200)
+          (width (q< |width| ui:*rect3*))
+      (height (q< |height| ui:*rect3*))
+      (n 600)
       (m 10)
       (left-right-margin 24)
       (bottom-margin 14)
