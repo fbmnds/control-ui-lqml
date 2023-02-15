@@ -93,12 +93,9 @@ Item {
    	    width: parent.width
    	    height: 200
    	    color: "lavender"
-
-            property string svgText: ""
-            function setSvg (s) {
-                svg.source = "data:image/svg+xml;utf8," + s;
-            }
-
+   	    
+   	    property string svgText: ""
+   	    
             WebSocketServer {
                 id: server
                 host: "0.0.0.0"
@@ -107,7 +104,7 @@ Item {
                 
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
-                        wrect.appendMessage("connected");
+                        wrect.setMessage("connected");
                         wrect.appendMessage(src.substring(0,10));
                         if (src.startsWith("<?xml"))
                         {
@@ -119,8 +116,8 @@ Item {
                             wrect.appendMessage("set svgText");
                             rect3.svgText = src;
                             wrect.appendMessage("call set-svg");
-                            Lisp.call(this, "app:set-svg");
-                            wrect.appendMessage(done);
+                            Lisp.call(this, "app:put-svg", src);
+                            wrect.appendMessage("data '" + rect3.svgText.substring(0,30) + "'");
                         }
                     });
                 }
@@ -146,16 +143,17 @@ Item {
                 messageBox.text += "\n" + message
             }
 
+            function setMessage(message) {
+                messageBox.text = "Waiting...\n" + message
+            }
+
             Text {
        		id: messageBox
        		font.pointSize: 12
        		anchors.verticalCenter: parent.verticalCenter
        		anchors.horizontalCenter: parent.horizontalCenter
        	        text: "Waiting..."
-   	    }
-            
-
+   	    	}
         }
-        
     }
 }

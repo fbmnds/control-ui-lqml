@@ -9,11 +9,10 @@
                     ;;(#:lpq #:lparallel.queue)
                     )
   (:export    #:button-pressed
-              #:set-svg
+              #:put-svg
               #:werkstattlicht
               #:receive-data
               #:generate-svg
-              #:set-svg
               ))
 
 

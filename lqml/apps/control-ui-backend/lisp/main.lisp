@@ -43,6 +43,7 @@
   (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/?"))))
   (values))
 
+#|
 (let ((width (q< |width| ui:*main*))
       (height (q< |height| ui:*main*))
       (n 200)
@@ -50,24 +51,29 @@
       (left-right-margin 24)
       (bottom-margin 14)
       (lbl-width 60))
-  (defun set-svg ()
-    (qjs |appendMessage| ui:*wrect* "in set-svg")
-    (let* ((data (q< |svgText| ui:*wrect3*))
-           (svg (ignore-errors
-                 (set-input-parameter :width width :n n :height height :m m
-                                      :left-right-margin left-right-margin
-                                      :bottom-margin bottom-margin
-                                      :lbl-width lbl-width)
-                 (qjs |appendMessage| ui:*wrect* "prepare..")
-                 (prepare-data data)
-                 (qjs |appendMessage| ui:*wrect*  "set..")
-                 (set-parameter)
-                 (qjs |appendMessage| ui:*wrect*  "transform..")
-                 (transform-data)
-                 (qjs |appendMessage| ui:*wrect* "draw...")
-                 (draw-svg :string))))
-      (qjs |appendMessage| ui:*wrect* (format nil "data '~a'" data))
-      (if svg
-          (qjs |setSvg| ui:*rect3* svg)
-          (qjs |setSvg| ui:*rect3* *svg2*)))))
-
+  )
+|#
+(defun put-svg (data)
+    ;;(error "test")
+    ;;(qlog "in set-svg")
+    ;;(qjs |appendMessage| ui:*wrect* "in set-svg")
+  (q> |svgText| ui:*rect3* (format nil "in put-svg: " data))
+  #|
+  (handler-case                         ;
+  (let ((svn (progn (set-input-parameter :width width :n n :height height :m m ;
+  :left-right-margin left-right-margin  ;
+  :bottom-margin bottom-margin          ;
+  :lbl-width lbl-width)                 ;
+  (receive-data data)                   ;
+  (prepare-data)                        ;
+  (set-parameter)                       ;
+  (transform-data)                      ;
+  (draw-svg :output :string))))         ;
+  (if svg                               ;
+              ;;(qjs |setSvg| ui:*rect3* svg) ;
+  (qjs |appendMessage| ui:*wrect* "success svg..") ;
+  (qjs |appendMessage| ui:*wrect* "fail svg.."))) ;
+  (condition (c)                        ;
+  (qjs |appendMessage| ui:*wrect* (format nil "error '~a'" c)))) ;
+  |#
+  (values))
