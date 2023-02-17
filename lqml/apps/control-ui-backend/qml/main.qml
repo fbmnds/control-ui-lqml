@@ -113,7 +113,7 @@ Item {
 
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
-                        rctMsgBox.setMessage("connected");
+                        rctMsgBox.setMessage("client :'" + webSocket.url.toString());
                         rctMsgBox.appendMessage(src.substring(0,20));
                         if (src.startsWith("<?xml"))
                         {
@@ -133,7 +133,7 @@ Item {
 
         Rectangle {
             id: rctMsgBox
-            objectName: "tctMsgBox"
+            objectName: "txtMsgBox"
             width: parent.width
             height: 260
             color: "lavender"
