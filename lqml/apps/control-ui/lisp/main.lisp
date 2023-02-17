@@ -43,11 +43,3 @@
   (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/?"))))
   (values))
 
-(let ((w (format nil "~a" (q< |width| ui:*main*)))
-      (h (format nil "~a" (q< |height| ui:*main*)))
-      (n "800"))
-  (defun set-svg ()
-    (let ((svg (ignore-errors (curl (x:cc *svg-server* "")))))
-      (if svg
-          (setf *svg* (format nil "data:image/svg+xml;utf8,~a" svg))
-          (setf *svg* *svg2*)))))

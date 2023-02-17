@@ -12,106 +12,122 @@ Item {
 
     Column {
         id: column
+        objectName: "column"
         spacing: 10
         width: parent.width
         height: parent.height
 
-      	Label {
-      	    id: label
+        Label {
+            id: label
             objectName: "label"
             font.pixelSize: 22
             width: parent.width
             height: 40
-            
+
             text: "Control UI"
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-      	}
+        }
 
-      	Button {
+        Button {
             id: button
-            objectName: "button"
-      	    
+            objectName: "btnWerkstattLicht"
+
             width: parent.width
             height: 50
-      	    
+
             text: "Licht"
 
             function set (clr) {
                 background.color = clr
             }
-            
+
             background: Rectangle {
-          	radius: 2
-          	color: "lightblue"
+                radius: 12
+                color: "lightblue"
             }
 
-	    Timer {
-       		id: textTimer1
-       		interval: 150000
-       		repeat: true
-       		running: true
-       		triggeredOnStart: true
-                function run () {
-                    Lisp.call(this, "app:werkstattlicht")
-                }
-       		onTriggered: run()
-   	    }
-	    
+            Timer {
+                id: tmWerkstattLicht
+                interval: 150000
+                repeat: true
+                running: true
+                triggeredOnStart: true
+
+                onTriggered: Lisp.call(this, "app:werkstattlicht")
+            }
+
             onPressed: Lisp.call(this, "app:button-pressed")
-      	}
-        
-	Rectangle {
-	    id: rect2
-   	    width: parent.width
-   	    height: 30
-   	    color: "lavender"
-	    
-   	    Text {
-       		id: foo2
-       		font.pointSize: 12
-       		anchors.verticalCenter: parent.verticalCenter
-       		anchors.horizontalCenter: parent.horizontalCenter
-       		
-       		function set() {
-           	    foo2.text = Date()
-       		}
-   	    }
-	    
-   	    Timer {
-       		id: textTimer2
-       		interval: 1000
-       		repeat: true
-       		running: true
-       		triggeredOnStart: true
-       		onTriggered: foo2.set()
-   	    }	
-	}
-        
+        }
+
         Rectangle {
-	    id: rect3
-   	    width: parent.width
-   	    height: 200
-   	    color: "lavender"
+            id: rctTime
+            width: parent.width
+            height: 30
+            color: "lavender"
+
+            Text {
+                id: txtTime
+                font.pointSize: 12
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+
+            }
+
+            Timer {
+                id: tmTime
+                interval: 1000
+                repeat: true
+                running: true
+                triggeredOnStart: true
+                onTriggered: txtTime.text = Date()
+            }
+        }
+
+        Rectangle {
+            id: rctTempHum
+            objectName: "rctTempHum"
+            width: parent.width
+            height: 200
+            color: "lavender"
+
+            property string svgText: ""
+
+            Image {
+                id: svg
+                objectName: "svg"
+                anchors.centerIn: parent
+                source: "svg/simple-example2.svg"
+            }
 
             WebSocketServer {
                 id: server
                 host: "0.0.0.0"
                 port: 7700
                 listen: true
-                
+
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
-                        if (src.startsWith("<?xml")) {
+                        rctMsgBox.setMessage("connected");
+                        rctMsgBox.appendMessage(src.substring(0,20));
+                        if (src.startsWith("<?xml"))
+                        {
                             svg.source = "data:image/svg+xml;utf8," + src;
-                        } else {
+                        }
+                        else if (src.startsWith("data:image/svg"))
+                        {
+                            svg.source = src;
+                        }
+                        else
+                        {
+                            console.log(src.substring(0,80));
                             let jsrc = JSON.parse(src);
                             if (jsrc.tag == "svg") {
-                                console.log(src);
                                 svg.source = "data:image/svg+xml;utf8," + jsrc.svg;
-                            } else {
-                                console.log(src);
-                                wrect.appendMessage(jsrc.tag);
+                            }
+                            else
+                            {
+                                rctMsgBox.appendMessage(jsrc.tag);
                             }
                         }
                     });
@@ -120,34 +136,31 @@ Item {
                     svg.source = "svg/simple-example2.svg";
                 }
             }
-
-            Image {
-                id: svg
-                anchors.centerIn: parent
-                source: "svg/simple-example2.svg"
-            }
-	}
+        }
 
         Rectangle {
-            id: wrect
+            id: rctMsgBox
+            objectName: "tctMsgBox"
             width: parent.width
             height: 260
             color: "lavender"
 
             function appendMessage(message) {
-                messageBox.text += "\n" + message
+                txtMsgBox.text += "\n" + message
+            }
+
+            function setMessage(message) {
+                txtMsgBox.text = "Waiting...\n" + message
             }
 
             Text {
-       		id: messageBox
-       		font.pointSize: 12
-       		anchors.verticalCenter: parent.verticalCenter
-       		anchors.horizontalCenter: parent.horizontalCenter
-       	        text: "Waiting..."
-   	    }
-            
-
+                id: txtMsgBox
+                objectName: "txtMsgBox"
+                font.pointSize: 12
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Waiting..."
+            }
         }
-        
     }
 }
