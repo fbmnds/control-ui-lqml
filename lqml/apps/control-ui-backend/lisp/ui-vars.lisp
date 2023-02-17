@@ -14,8 +14,9 @@
 
 (defparameter *main* "main")
 (defparameter *label* "label")
-(defparameter *button* "button")
-(defparameter *rect3* "rect3")
 (defparameter *column* "column")
-(defparameter *wrect* "wrect")
-(defparameter *msgbox* "msgbox")
+(defparameter *button* "btnWerkstattLicht")
+(defparameter *rect3* "rctTempHum")
+(defparameter *svg* "svg")
+(defparameter *wrect* "rctMsgBox")
+(defparameter *msgbox* "txtMsgBox")
