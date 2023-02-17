@@ -42,29 +42,66 @@
   (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/?"))))
   (values))
 
+(defparameter *n-messages* 12)
+(defparameter *messages* (make-array *n-messages*
+                                     :element-type 'string
+                                     :initial-element nil))
 
+(let ((idx 0))
+  (defun add-line (line)
+    (if (< idx (1- *n-messages*))
+        (progn (setf (aref *messages* idx) line)
+               (setf idx (1+ idx)))
+        (setf idx 0))))
+
+(defun lines ()
+    (let ((s (aref *messages* 0)))
+      (if (null s)
+          (setf s "")
+          (progn (loop repeat (1- *n-messages*)
+                       for i = 1
+                       do (progn (x:when-it (aref *messages* i)
+                                       (setf s (format nil "~a~%~a" s x:it)))
+                                     (setf i (+ i 1))))))     
+      s))
+
+(defun format-ht (ht)
+  (when ht
+    (format nil "~a | ~aC | ~a% | ~a"
+            (gethash "ts" ht)
+            (fmt10 (gethash "temp" ht))
+            (fmt10 (gethash "hum" ht))
+            (gethash "state" ht))))
 
 (defun put-svg (data)
-    (let ((svg "data:image/svg+xmlutf8,")
-          (width (q< |width| ui:*rect3*))
-      (height (q< |height| ui:*rect3*))
-      (n 600)
-      (m 10)
-      (left-right-margin 24)
-      (bottom-margin 14)
-      (lbl-width 60))
-      (handler-case
-          (progn (set-input-parameter :width width :n n :height height :m m
-                                      :left-right-margin left-right-margin
-                                      :bottom-margin bottom-margin
-                                      :lbl-width lbl-width)
-                 (receive-data data)
-                 (prepare-data)
-                 (set-parameter)
-                 (transform-data)
-                 (setf svg (str+ svg (draw-svg :output :string))))
-        (condition (c)
-          (setf svg *svg*)
-          (q> |svgText| ui:*rect3* (format nil "error '~a'" c))))
-      (q> |svgText| ui:*rect3* svg))
-  (values))
+  (let ((svg "data:image/svg+xmlutf8,")
+        (width (q< |width| ui:*rect3*))
+        (height (q< |height| ui:*rect3*))
+        (n 600)
+        (m 10)
+        (left-right-margin 24)
+        (bottom-margin 14)
+        (lbl-width 60)
+        text)
+    (handler-case
+        (progn (set-input-parameter :width width :n n :height height :m m
+                                    :left-right-margin left-right-margin
+                                    :bottom-margin bottom-margin
+                                    :lbl-width lbl-width)
+               (receive-data data)
+               (loop for i from 0 to (length *data*)
+                     while (< i *n-messages*)
+                     do (add-line (format-ht (nth i *data*))))
+               (prepare-data)
+               (set-parameter)
+               (transform-data)
+               (setf svg (str+ svg (draw-svg :output :string)))
+               (setf text (lines)))
+      (condition (c)
+        (setf svg *svg*)
+        (setf text (format nil "error '~a'" c))
+        (qlog (format nil "error '~a'" c))))
+    (q> |svgText| ui:*rect3* svg)
+    (q> |svgMsg| ui:*rect3* text)
+    (values)))
+

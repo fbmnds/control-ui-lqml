@@ -24,8 +24,7 @@
         " text-anchor=\"middle\" fill=\"green\">SVG</text></svg>"))
 
 (defparameter *fetch-db-cmd*
-  (str+ "eval \"$(ssh-agent)\" && ssh-add ~/.ssh/bitbucket_rsa"
-        " && /usr/bin/scp -i /home/dev/.ssh/bitbucket_rsa.pub"
+  (str+ "/usr/bin/scp -i /home/dev/.ssh/bitbucket_rsa"
         " dev@192.168.178.32:~/projects/heating-control/data/heating.db"
         " /home/dev/projects/heating-control/data/heating.db"))
 

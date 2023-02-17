@@ -92,6 +92,7 @@ Item {
             color: "lavender"
 
             property string svgText: ""
+            property string svgMsg: ""
 
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
@@ -122,6 +123,7 @@ Item {
                         else
                         {
                             rctTempHum.setSvgText(src);
+                            rctMsgBox.setMessage(rctTempHum.svgMsg);
                         }
                     });
                 }
