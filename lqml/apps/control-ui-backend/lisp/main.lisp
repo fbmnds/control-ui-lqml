@@ -47,23 +47,14 @@
                                      :element-type 'string
                                      :initial-element nil))
 
-(let ((idx 0))
-  (defun add-line (line)
-    (if (< idx (1- *n-messages*))
-        (progn (setf (aref *messages* idx) line)
-               (setf idx (1+ idx)))
-        (setf idx 0))))
-
 (defun lines ()
-    (let ((s (aref *messages* 0)))
-      (if (null s)
-          (setf s "")
-          (progn (loop repeat (1- *n-messages*)
-                       for i = 1
-                       do (progn (x:when-it (aref *messages* i)
-                                       (setf s (format nil "~a~%~a" s x:it)))
-                                     (setf i (+ i 1))))))     
-      s))
+  (let ((s (aref *messages* 0)))
+    (if (null s)
+        (setf s "")
+        (progn (loop for i from 1 to (1- *n-messages*)
+                     do (x:when-it (aref *messages* i)
+                                 (setf s (format nil "~a~%~a" s x:it))))))
+    s))
 
 (defun format-ht (ht)
   (when ht
@@ -89,9 +80,10 @@
                                     :bottom-margin bottom-margin
                                     :lbl-width lbl-width)
                (receive-data data)
-               (loop for i from 0 to (length *data*)
-                     while (< i *n-messages*)
-                     do (add-line (format-ht (nth i *data*))))
+               (loop for i from 0 to (1- *n-messages*)
+                     do (if (< i (length *data*))
+                            (setf (aref *messages* i) (format-ht (nth i *data*)))
+                            (setf (aref *messages* i) nil)))
                (prepare-data)
                (set-parameter)
                (transform-data)
@@ -104,4 +96,3 @@
     (q> |svgText| ui:*rect3* svg)
     (q> |svgMsg| ui:*rect3* text)
     (values)))
-
