@@ -14,7 +14,7 @@ Rectangle {
     
     WebSocket {
         id: socket
-        url: "ws://192.168.178.8:7700"
+        url: "ws://192.168.178.23:7700"
 
         onTextMessageReceived: {
             messageBox.text = messageBox.text + "\nReceived message: " + message

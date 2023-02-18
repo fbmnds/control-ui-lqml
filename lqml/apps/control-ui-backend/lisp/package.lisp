@@ -1,4 +1,3 @@
-
 (defpackage :app
   (:use :cl :qml :cl-svg :parse-float)
   (:local-nicknames (#:lt #:local-time)

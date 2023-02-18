@@ -20,3 +20,4 @@
 (defparameter *svg* "svg")
 (defparameter *wrect* "rctMsgBox")
 (defparameter *msgbox* "txtMsgBox")
+(defparameter *wsclient* "wsclient")

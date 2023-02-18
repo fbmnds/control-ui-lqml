@@ -116,6 +116,7 @@ Item {
                         }
                         else if (src.startsWith("data:image/svg"))
                         {
+                            console.log(src.substring(0,30));
                             svg.source = src;
                         }
                         else
@@ -159,6 +160,7 @@ Item {
                 font.pointSize: 12
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
+                lineHeight: 1.1
                 text: "Waiting..."
             }
         }

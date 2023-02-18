@@ -24,7 +24,7 @@ Item {
             width: parent.width
             height: 40
 
-            text: "Control UI"
+            text: "Control UI Backend"
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
         }
@@ -93,10 +93,15 @@ Item {
 
             property string svgText: ""
             property string svgMsg: ""
+            property string wsmsg: ""
+
+            property var clients: ["192.168.178.23", "192.168.178.31"]
 
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
                 svg.source = svgText;
+                socket.active = true;
+                rctTempHum.wsmsg = svgText.split('"').join('\"');
             }
 
             Image {
@@ -131,6 +136,34 @@ Item {
                     svg.source = "svg/simple-example2.svg";
                 }
             }
+
+            Timer {
+                id: tmSocket
+                interval: 3000
+                repeat: false
+                running: false
+                triggeredOnStart: false
+                onTriggered: socket.active = false
+            }
+
+            WebSocket {
+                id: socket
+                url: "ws://192.168.178.31:7700"
+
+                onTextMessageReceived: {
+                    rctMsgBox.appendMessage(message)
+                }
+                onStatusChanged: if (socket.status == WebSocket.Error) {
+                    rctMsgBox.appendMessage("Error: " + socket.errorString)
+                } else if (socket.status == WebSocket.Open) {
+                    socket.sendTextMessage(rctTempHum.wsmsg);
+                    console.log("Socket open, sending...")
+                    tmSocket.running = true;
+                } else if (socket.status == WebSocket.Closed) {
+                    console.log("Socket closed")
+                }
+                active: false
+            }
         }
 
         Rectangle {
@@ -145,7 +178,7 @@ Item {
             }
 
             function setMessage(message) {
-                txtMsgBox.text = "Waiting...\n" + message
+                txtMsgBox.text = message
             }
 
             Text {
@@ -154,7 +187,8 @@ Item {
                 font.pointSize: 12
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "Waiting..."
+                lineHeight: 1.1
+                text: "Waiting...\n"
             }
         }
     }

@@ -129,6 +129,7 @@
                       *max-ts* max-ts
                       *min-ts* min-ts)))
 
+#-mobile
 (defun fetch-data (&key
                      (n *n*) (w *w*)
                      (database *database*))

@@ -4,6 +4,7 @@
 (ensure-permissions :write-external-storage)
 (ensure-permissions :access-network-state)
 
+
 (defvar *svg-server* "http://192.168.178.8:7700/svg")
 (defvar *werkstatt-licht* "http://192.168.178.11")
 
@@ -65,7 +66,7 @@
             (gethash "state" ht))))
 
 (defun put-svg (data)
-  (let ((svg "data:image/svg+xmlutf8,")
+  (let ((svg "data:image/svg+xml;utf8,")
         (width (q< |width| ui:*rect3*))
         (height (q< |height| ui:*rect3*))
         (n 600)
@@ -96,3 +97,5 @@
     (q> |svgText| ui:*rect3* svg)
     (q> |svgMsg| ui:*rect3* text)
     (values)))
+
+
