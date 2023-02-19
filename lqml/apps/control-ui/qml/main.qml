@@ -93,20 +93,22 @@ Item {
 
             property string svgText: ""
             property string svgText64: ""
+            property string svgMsg: ""
+            property string svgMsg64: ""
 
-            function b64Decode (txt) {
-                Lisp.call(this,"app:b64-decode", txt);
+            function b64Decode (symb, txt) {
+                Lisp.call(this,"app:b64-decode", symb, txt);
             }
 
-            onSvgTextChanged: Lisp.call(this,"app:b64-decode", txt);
+            onSvgTextChanged: b64Decode("svgText64", svgText);
             onSvgText64Changed: {
                 //b64Decode(svgText);
                 console.log(svgText64.substring(0,30));
                 svg.source = "data:image/svg+xml;utf8," + svgText64;
             }
-            //onSvgMsgChanged: rctMsgBox.setMessage(svgText)
+            onSvgMsgChanged: b64Decode("svgMsg64", svgMsg);
+            onSvgMsg64Changed: rctMsgBox.setMessage(svgMsg64)
 
-            
             Image {
                 id: svg
                 objectName: "svg"
@@ -123,7 +125,7 @@ Item {
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
                         rctMsgBox.setMessage("connected");
-                        rctMsgBox.appendMessage(src);
+                        rctMsgBox.appendMessage(src.substring(0,30));
                         if (src.startsWith("<?xml"))
                         {
                             svg.source = "data:image/svg+xml;utf8," + src;
@@ -137,8 +139,8 @@ Item {
                             console.log(src);
                             let jsrc = JSON.parse(src);
                             if (jsrc.tag == "data") {
-                                rctTempHum.b64Decode(jsrc.svg);
-                                rctMsgBox.setMessage(jsrc.text);
+                                rctTempHum.b64Decode("svgText64", jsrc.svg);
+                                rctTempHum.b64Decode("svgMsg64", jsrc.text);
                             }
                         }
                     });

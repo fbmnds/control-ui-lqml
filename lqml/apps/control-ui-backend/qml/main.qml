@@ -94,6 +94,7 @@ Item {
             property string svgText: ""
             property string svgText64: ""
             property string svgMsg: ""
+            property string svgMsg64: ""
             property string wsmsg: ""
 
             property var clients: ["192.168.178.23", "192.168.178.31"]
@@ -106,7 +107,7 @@ Item {
                 console.log("broadcast...");
                 socket.active = true;
                 rctTempHum.wsmsg =
-                    '{ \"tag\": \"data\", \"text\": \"svgMsg\", \"svg\": \"'
+                    '{ \"tag\": \"data\", \"text\": \"' + svgMsg64 +'\", \"svg\": \"'
                     + svgText64 + '\" }';
             }
 

@@ -43,7 +43,15 @@
   (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/?"))))
   (values))
 
-(defun b64-decode (s64)
-  (q> |svgText64| ui:*rect3* (base64:base64-string-to-string s64))
+(defun %b64-decode (var s64)
+  (let ((symb (make-symbol var)))
+    (q> symb ui:*rect3* (base64:base64-string-to-string s64)))
+  (values))
+
+(defun b64-decode (var s64)
+  (when (equal var "svgText64")
+    (q> |svgText64| ui:*rect3* (base64:base64-string-to-string s64)))
+  (when (equal var "svgMsg64")
+    (q> |svgMsg64| ui:*rect3* (base64:base64-string-to-string s64)))
   (values))
 
