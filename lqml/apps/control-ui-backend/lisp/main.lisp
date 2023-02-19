@@ -96,11 +96,10 @@
         (qlog (format nil "error '~a'" c))))
     (q> |svgText| ui:*rect3* (str+ "data:image/svg+xml;utf8," svg))
     (q> |svgMsg| ui:*rect3* text)
-    (q> |svgText2| ui:*rect3* (base64:string-to-base64-string svg))
-    (q> |svgMsg2| ui:*rect3* text)
+    (q> |svgText64| ui:*rect3* (base64:string-to-base64-string svg))
     (values)))
 
 
 (defun b64-decode (s64)
-  (q> |svgText2| ui:*rect3* (base64:base64-string-to-string s64))
+  (q> |svgText64| ui:*rect3* (base64:base64-string-to-string s64))
   (values))

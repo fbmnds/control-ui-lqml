@@ -93,6 +93,14 @@ Item {
 
             property string svgText: ""
 
+            onSvgTextChanged: {
+                Lisp.call(this,"app:b64-decode", svgText2);
+                console.log(svgText2.substring(0,30));
+                svg.source = "data:image/svg+xml;utf8," + svgText2
+            }
+            onSvgMsgChanged: rctMsgBox.setMessage(svgText)
+
+            
             Image {
                 id: svg
                 objectName: "svg"

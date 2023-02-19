@@ -1,6 +1,7 @@
 (defpackage :app
-  (:use :cl :qml)
+  (:use :cl :qml :cl-base64)
   (:export
    #:button-pressed
-   #:werkstattlicht))
+   #:werkstattlicht
+   #:b64-decode))
 

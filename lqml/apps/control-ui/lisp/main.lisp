@@ -43,3 +43,7 @@
   (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/?"))))
   (values))
 
+(defun b64-decode (s64)
+  (q> |svgText2| ui:*rect3* (base64:base64-string-to-string s64))
+  (values))
+

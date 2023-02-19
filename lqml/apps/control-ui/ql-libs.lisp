@@ -4,4 +4,5 @@
 (ql:quickload :uiop)
 (ql:quickload :local-time)
 (ql:quickload :yason)
+(ql:quickload :cl-base64)
 
