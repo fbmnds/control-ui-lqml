@@ -109,7 +109,7 @@ Item {
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
                         rctMsgBox.setMessage("connected");
-                        rctMsgBox.appendMessage(src.substring(0,20));
+                        rctMsgBox.appendMessage(src);
                         if (src.startsWith("<?xml"))
                         {
                             svg.source = "data:image/svg+xml;utf8," + src;
@@ -121,14 +121,11 @@ Item {
                         }
                         else
                         {
-                            console.log(src.substring(0,80));
+                            console.log(src);
                             let jsrc = JSON.parse(src);
                             if (jsrc.tag == "svg") {
-                                svg.source = "data:image/svg+xml;utf8," + jsrc.svg;
-                            }
-                            else
-                            {
-                                rctMsgBox.appendMessage(jsrc.tag);
+                                svg.source = jsrc.data;
+                                rctMsgBox.setMessage(jsrc.text);
                             }
                         }
                     });
@@ -151,7 +148,7 @@ Item {
             }
 
             function setMessage(message) {
-                txtMsgBox.text = "Waiting...\n" + message
+                txtMsgBox.text = message
             }
 
             Text {

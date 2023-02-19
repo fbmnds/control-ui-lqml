@@ -66,7 +66,7 @@
             (gethash "state" ht))))
 
 (defun put-svg (data)
-  (let ((svg "data:image/svg+xml;utf8,")
+  (let ((svg "")
         (width (q< |width| ui:*rect3*))
         (height (q< |height| ui:*rect3*))
         (n 600)
@@ -94,8 +94,13 @@
         (setf svg *svg*)
         (setf text (format nil "error '~a'" c))
         (qlog (format nil "error '~a'" c))))
-    (q> |svgText| ui:*rect3* svg)
+    (q> |svgText| ui:*rect3* (str+ "data:image/svg+xml;utf8," svg))
     (q> |svgMsg| ui:*rect3* text)
+    (q> |svgText2| ui:*rect3* (base64:string-to-base64-string svg))
+    (q> |svgMsg2| ui:*rect3* text)
     (values)))
 
 
+(defun b64-decode (s64)
+  (q> |svgText2| ui:*rect3* (base64:base64-string-to-string s64))
+  (values))

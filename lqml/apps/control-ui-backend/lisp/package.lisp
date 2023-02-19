@@ -1,5 +1,5 @@
 (defpackage :app
-  (:use :cl :qml :cl-svg :parse-float)
+  (:use :cl :qml :cl-svg :parse-float :cl-base64)
   (:local-nicknames (#:lt #:local-time)
                     ;;(#:ws #:websocket-driver)
                     ;;(#:wsd #:websocket-driver-client)
@@ -12,6 +12,7 @@
            #:receive-data
            #:generate-svg
            #:put-svg
+           #:b64-decode
            ))
 
 

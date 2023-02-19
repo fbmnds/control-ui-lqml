@@ -93,15 +93,32 @@ Item {
 
             property string svgText: ""
             property string svgMsg: ""
+            property string svgText2: ""
+            property string svgMsg2: ""
             property string wsmsg: ""
 
             property var clients: ["192.168.178.23", "192.168.178.31"]
 
+
+            onSvgTextChanged: {
+                Lisp.call(this,"app:b64-decode", svgText2);
+                console.log(svgText2.substring(0,30));
+                svg.source = "data:image/svg+xml;utf8," + svgText2
+            }
+            onSvgMsgChanged: rctMsgBox.setMessage(svgText)
+
+            //onSvgText2Changed: broadcast()
+
+
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
-                svg.source = svgText;
+            }
+            
+            function broadcast () {
+                //console.log(svgText2);
                 socket.active = true;
-                rctTempHum.wsmsg = svgText.split('"').join('\"');
+                rctTempHum.wsmsg = '{ "tag": "data", "text": "test text", "svg": "'
+                    + svgText2 + '" }';
             }
 
             Image {
