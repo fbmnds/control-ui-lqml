@@ -92,13 +92,19 @@ Item {
             color: "lavender"
 
             property string svgText: ""
+            property string svgText64: ""
 
-            onSvgTextChanged: {
-                Lisp.call(this,"app:b64-decode", svgText2);
-                console.log(svgText2.substring(0,30));
-                svg.source = "data:image/svg+xml;utf8," + svgText2
+            function b64Decode (txt) {
+                Lisp.call(this,"app:b64-decode", txt);
             }
-            onSvgMsgChanged: rctMsgBox.setMessage(svgText)
+
+            onSvgTextChanged: Lisp.call(this,"app:b64-decode", txt);
+            onSvgText64Changed: {
+                //b64Decode(svgText);
+                console.log(svgText64.substring(0,30));
+                svg.source = "data:image/svg+xml;utf8," + svgText64;
+            }
+            //onSvgMsgChanged: rctMsgBox.setMessage(svgText)
 
             
             Image {
@@ -124,15 +130,14 @@ Item {
                         }
                         else if (src.startsWith("data:image/svg"))
                         {
-                            console.log(src.substring(0,30));
                             svg.source = src;
                         }
                         else
                         {
                             console.log(src);
                             let jsrc = JSON.parse(src);
-                            if (jsrc.tag == "svg") {
-                                svg.source = jsrc.data;
+                            if (jsrc.tag == "data") {
+                                rctTempHum.b64Decode(jsrc.svg);
                                 rctMsgBox.setMessage(jsrc.text);
                             }
                         }

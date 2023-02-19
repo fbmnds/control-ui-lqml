@@ -101,16 +101,19 @@ Item {
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
             }
-            
+
+            function broadcast() {
+                console.log("broadcast...");
+                socket.active = true;
+                rctTempHum.wsmsg =
+                    '{ \"tag\": \"data\", \"text\": \"svgMsg\", \"svg\": \"'
+                    + svgText64 + '\" }';
+            }
+
             onSvgTextChanged: svg.source = svgText
             onSvgMsgChanged: rctMsgBox.setMessage(svgText)
 
-            onSvgText64Changed: {
-                //console.log(svgText2);
-                socket.active = true;
-                rctTempHum.wsmsg = '{ "tag": "data", "text": "' + svgMsg
-                    + '", "svg": "' + svgText2 + '" }';
-            }
+            onSvgText64Changed: broadcast()
 
             Image {
                 id: svg
