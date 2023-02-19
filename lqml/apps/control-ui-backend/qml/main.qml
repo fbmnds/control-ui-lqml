@@ -97,24 +97,43 @@ Item {
             property string svgMsg64: ""
             property string wsmsg: ""
 
-            property var clients: ["192.168.178.23", "192.168.178.31"]
+            property var clientIP: ["192.168.178.23", "192.168.178.31"]
+            property int client: 0
 
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
             }
 
-            function broadcast() {
-                console.log("broadcast...");
+            function triggerTransmitt () {
                 socket.active = true;
                 rctTempHum.wsmsg =
                     '{ \"tag\": \"data\", \"text\": \"' + svgMsg64 +'\", \"svg\": \"'
                     + svgText64 + '\" }';
             }
 
+            function broadcast() {
+                console.log("broadcast..." + client + " " + clientIP.length);
+                if (client < clientIP.length) {
+                    console.log("...");
+                    socket.url = "ws://" + clientIP[client] + ":7700";
+                    client += 1;
+                    triggerTransmitt();
+                }
+                else
+                {
+                    client = 0;
+                    tmSocket.running = false;
+                }
+            }
+
             onSvgTextChanged: svg.source = svgText
             onSvgMsgChanged: rctMsgBox.setMessage(svgText)
 
-            onSvgText64Changed: broadcast()
+            onSvgText64Changed: {
+                if (rctTempHum.client == 0) { broadcast(); }
+            }
+
+            //onWsmsgChanged: socket.active = true;
 
             Image {
                 id: svg
@@ -143,6 +162,7 @@ Item {
                             rctTempHum.setSvgText(src);
                             rctMsgBox.setMessage(rctTempHum.svgMsg);
                         }
+                        //tmSocket.running = true;
                     });
                 }
                 onErrorStringChanged: {
@@ -152,28 +172,35 @@ Item {
 
             Timer {
                 id: tmSocket
-                interval: 3000
+                interval: 5000
                 repeat: false
                 running: false
                 triggeredOnStart: false
-                onTriggered: socket.active = false
+                onTriggered: {
+                    console.log("end of transmitt to " + socket.url);
+                    socket.active = false;
+                    rctTempHum.broadcast();
+                }
             }
 
             WebSocket {
                 id: socket
-                url: "ws://192.168.178.31:7700"
+                url: ""
 
                 onTextMessageReceived: {
                     rctMsgBox.appendMessage(message)
                 }
-                onStatusChanged: if (socket.status == WebSocket.Error) {
-                    rctMsgBox.appendMessage("Error: " + socket.errorString)
-                } else if (socket.status == WebSocket.Open) {
-                    socket.sendTextMessage(rctTempHum.wsmsg);
-                    console.log("Socket open, sending...")
-                    tmSocket.running = true;
-                } else if (socket.status == WebSocket.Closed) {
-                    console.log("Socket closed")
+                onStatusChanged: {
+                    console.log("send to url " + socket.url);
+                    tmSocket.running = true; // timeout for connection
+                    if (socket.status == WebSocket.Error) {
+                        rctMsgBox.appendMessage("Error: " + socket.url + socket.errorString)
+                    } else if (socket.status == WebSocket.Open) {
+                        console.log("Socket open, sending...");
+                        socket.sendTextMessage(rctTempHum.wsmsg);
+                    } else if (socket.status == WebSocket.Closed) {
+                        console.log("Socket closed for " + socket.url)
+                    }
                 }
                 active: false
             }
