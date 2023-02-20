@@ -38,10 +38,18 @@
   (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/r1"))))
   (values))
 
-(defun werkstattlicht ()
-  (update-status "Werkstattlicht ..." "lightyellow")
-  (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/?"))))
-  (values))
+(let ((current-status "{ \"r1\" : 0 }"))
+  (defun werkstattlicht ()
+    (update-status "Werkstattlicht ..." "lightyellow")
+    (let ((status (ignore-errors (curl (str+ *werkstatt-licht* "/?")))))
+      (set-status status)
+      (cond ((null status)
+             (qjs |appendMessage| ui:*wrect* "Error: no response from ESP"))
+            ((string/= status current-status)
+             (qjs |addBroadcastEvent| ui:*rect3* "/werkstattlicht" status)
+             (setf current-status status))
+            (t :ignore)))
+    (values)))
 
 (defparameter *n-messages* 12)
 (defparameter *messages* (make-array *n-messages*
@@ -95,7 +103,13 @@
         (setf text (format nil "error '~a'" c))
         (qlog (format nil "error '~a'" c))))
     (q> |svgText| ui:*rect3* (str+ "data:image/svg+xml;utf8," svg))
-    (q> |svgText64| ui:*rect3* (base64:string-to-base64-string svg))
     (q> |svgMsg| ui:*rect3* text)
-    (q> |svgMsg64| ui:*rect3* (base64:string-to-base64-string text))
+    (let ((svg-text-64 (base64:string-to-base64-string svg))
+          (svg-msg-64 (base64:string-to-base64-string text)))
+      (q> |svgText64| ui:*rect3* svg-text-64)
+      (q> |svgMsg64| ui:*rect3* svg-msg-64)
+      (qjs |addBroadcastEvent| ui:*rect3* "/svg"
+           (str+ "{ \"tag\": \"data\", \"text\": \""
+                 svg-msg-64 "\", \"svg\": \""
+                 svg-text-64 "\" }")))        
     (values)))

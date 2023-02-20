@@ -38,9 +38,9 @@
   (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/r1"))))
   (values))                               
 
-(defun werkstattlicht ()  
+(defun werkstattlicht (status)  
   (update-status "Werkstattlicht ..." "lightyellow")
-  (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/?"))))
+  (set-status status)
   (values))
 
 (defun %b64-decode (var s64)

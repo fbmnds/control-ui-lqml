@@ -49,7 +49,7 @@ Item {
 
             Timer {
                 id: tmWerkstattLicht
-                interval: 150000
+                interval: 30000
                 repeat: true
                 running: true
                 triggeredOnStart: true
@@ -95,45 +95,65 @@ Item {
             property string svgText64: ""
             property string svgMsg: ""
             property string svgMsg64: ""
-            property string wsmsg: ""
 
+            property var bcQueue: []
             property var clientIP: ["192.168.178.23", "192.168.178.31"]
             property int client: 0
-
+            property string wsmsg: ""
+            property string bcUrl: ""
+            property string bcMsg: ""
+            
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
             }
 
-            function triggerTransmitt () {
+            function triggerTransmitt (client) {
+                console.log("broadcast..." + client + " " + clientIP.length);
+                socket.url = "ws://" + clientIP[client] + ":7700" + bcUrl;
+                rctTempHum.client = client + 1;
                 socket.active = true;
-                rctTempHum.wsmsg =
-                    '{ \"tag\": \"data\", \"text\": \"' + svgMsg64 +'\", \"svg\": \"'
-                    + svgText64 + '\" }';
+                rctTempHum.wsmsg = bcMsg;
             }
 
+            function addBroadcastEvent (url, msg) {
+                bcQueue.push([url, msg]);
+            }
+            
             function broadcast() {
-                console.log("broadcast..." + client + " " + clientIP.length);
-                if (client < clientIP.length) {
-                    console.log("...");
-                    socket.url = "ws://" + clientIP[client] + ":7700";
-                    client += 1;
-                    triggerTransmitt();
+                if (client < clientIP.length)
+                {
+                    triggerTransmitt(client);
                 }
                 else
                 {
                     client = 0;
                     tmSocket.running = false;
+                    tmBroadcast.running = true;
+                }
+            }
+
+            Timer {
+                id: tmBroadcast
+                interval: 3000
+                repeat: true
+                running: true
+                triggeredOnStart: true
+                onTriggered: {
+                    console.log('triggered: length ' + rctTempHum.bcQueue.length);
+                    if (rctTempHum.bcQueue.length > 0)
+                    {
+                        running = false;
+                        let bc = rctTempHum.bcQueue.shift();
+                        console.log('url ' + bc[0] + " msg " + bc[1]);
+                        rctTempHum.bcUrl = bc[0];
+                        rctTempHum.bcMsg = bc[1];
+                        rctTempHum.broadcast();
+                    }
                 }
             }
 
             onSvgTextChanged: svg.source = svgText
             onSvgMsgChanged: rctMsgBox.setMessage(svgText)
-
-            onSvgText64Changed: {
-                if (rctTempHum.client == 0) { broadcast(); }
-            }
-
-            //onWsmsgChanged: socket.active = true;
 
             Image {
                 id: svg
@@ -172,7 +192,7 @@ Item {
 
             Timer {
                 id: tmSocket
-                interval: 5000
+                interval: 3000
                 repeat: false
                 running: false
                 triggeredOnStart: false

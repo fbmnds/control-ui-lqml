@@ -47,15 +47,15 @@ Item {
                 color: "lightblue"
             }
 
-            Timer {
-                id: tmWerkstattLicht
-                interval: 150000
-                repeat: true
-                running: true
-                triggeredOnStart: true
-
-                onTriggered: Lisp.call(this, "app:werkstattlicht")
-            }
+//            Timer {
+//                id: tmWerkstattLicht
+//                interval: 150000
+//                repeat: true
+//                running: true
+//                triggeredOnStart: true
+//
+//                onTriggered: Lisp.call(this, "app:werkstattlicht")
+//            }
 
             onPressed: Lisp.call(this, "app:button-pressed")
         }
@@ -122,11 +122,19 @@ Item {
                 port: 7700
                 listen: true
 
+                function updateWerkstattlicht(src) {
+                    Lisp.call(this, "app:werkstattlicht", src);
+                }
+
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
-                        rctMsgBox.setMessage("connected");
+                        //rctMsgBox.setMessage("connected");
                         rctMsgBox.appendMessage(src.substring(0,30));
-                        if (src.startsWith("<?xml"))
+                        if (webSocket.url.toString().endsWith('/werkstattlicht'))
+                        {
+                            updateWerkstattlicht(src);
+                        }
+                        else if (src.startsWith("<?xml"))
                         {
                             svg.source = "data:image/svg+xml;utf8," + src;
                         }
