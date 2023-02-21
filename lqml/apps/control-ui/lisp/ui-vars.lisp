@@ -8,7 +8,8 @@
    #:*svg*
    #:*column*
    #:*wrect*
-   #:*msgbox*))
+   #:*msgbox*
+   #:*wsclient*))
 
 (in-package :ui)
 
@@ -20,3 +21,4 @@
 (defparameter *svg* "svg")
 (defparameter *wrect* "rctMsgBox")
 (defparameter *msgbox* "txtMsgBox")
+(defparameter *wsclient* "wsclient")

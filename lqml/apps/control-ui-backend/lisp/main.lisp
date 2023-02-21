@@ -31,7 +31,7 @@
         ((search "{ \"r1\" : 0 }" status)
          (update-status "Werkstattlicht AUS" "lightgrey"))
         (t
-         (update-status "Werkstattlicht ..." "lightred"))))
+         (update-status "Werkstattlicht ..." "red"))))
 
 (defun button-pressed ()
   (update-status "Werkstattlicht ..." "lightyellow")
@@ -41,7 +41,8 @@
 (let ((current-status "{ \"r1\" : 0 }"))
   (defun werkstattlicht ()
     (update-status "Werkstattlicht ..." "lightyellow")
-    (let ((status (ignore-errors (curl (str+ *werkstatt-licht* "/?")))))
+    (let ((status (ignore-errors
+                   (string-trim '(#\r #\n) (curl (str+ *werkstatt-licht* "/?"))))))
       (set-status status)
       (cond ((null status)
              (qjs |appendMessage| ui:*wrect* "Error: no response from ESP")

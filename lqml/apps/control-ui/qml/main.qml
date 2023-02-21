@@ -35,32 +35,22 @@ Item {
 
             width: parent.width
             height: 50
-
             text: "Licht"
-
-            function set (clr) {
-                background.color = clr
-            }
-
             background: Rectangle {
                 radius: 12
                 color: "lightblue"
             }
 
-//            Timer {
-//                id: tmWerkstattLicht
-//                interval: 150000
-//                repeat: true
-//                running: true
-//                triggeredOnStart: true
-//
-//                onTriggered: Lisp.call(this, "app:werkstattlicht")
-//            }
+            function set (clr) {
+                background.color = clr
+            }
 
-            onPressed: Lisp.call(this, "app:button-pressed")
+            onPressed: { Lisp.call(this, "app:button-pressed") }
+
+            Component.onCompleted: { socket.wslRequest('/?') }
         }
 
-        Rectangle {
+        Rectangle {//{{{
             id: rctTime
             width: parent.width
             height: 30
@@ -82,9 +72,9 @@ Item {
                 triggeredOnStart: true
                 onTriggered: txtTime.text = Date()
             }
-        }
+        }//}}}
 
-        Rectangle {
+        Rectangle {//{{{
             id: rctTempHum
             objectName: "rctTempHum"
             width: parent.width
@@ -102,10 +92,10 @@ Item {
 
             onSvgTextChanged: b64Decode("svgText64", svgText);
             onSvgText64Changed: {
-                //b64Decode(svgText);
-                console.log(svgText64.substring(0,30));
-                svg.source = "data:image/svg+xml;utf8," + svgText64;
-            }
+                        //b64Decode(svgText);
+                        console.log(svgText64.substring(0,30));
+                        svg.source = "data:image/svg+xml;utf8," + svgText64;
+}
             onSvgMsgChanged: b64Decode("svgMsg64", svgMsg);
             onSvgMsg64Changed: rctMsgBox.setMessage(svgMsg64)
 
@@ -130,7 +120,8 @@ Item {
                     webSocket.onTextMessageReceived.connect(function(src) {
                         //rctMsgBox.setMessage("connected");
                         rctMsgBox.appendMessage(src.substring(0,30));
-                        if (webSocket.url.toString().endsWith('/werkstattlicht'))
+                        let wsurl = webSocket.url.toString();
+                        if (wsurl.indexOf('/werkstattlicht') >= 0)
                         {
                             updateWerkstattlicht(src);
                         }
@@ -157,9 +148,72 @@ Item {
                     svg.source = "svg/simple-example2.svg";
                 }
             }
+        }//}}}
+
+
+        Timer {
+            id: tmSocket
+            interval: 6000
+            repeat: false
+            running: false
+            triggeredOnStart: false
+
+            onTriggered: {
+                console.log("end of transmitt to " + socket.url);
+                socket.active = false;
+            }
         }
 
-        Rectangle {
+        WebSocket {
+            id: socket
+            objectName: "wsclient"
+            url: ""
+            active: false
+
+            property string msg: ""
+
+            function wslRequest (slug) {
+                socket.url = "ws://192.168.178.6:7700/werkstattlicht" + slug;
+                socket.active = true;
+                socket.msg = ':ignore';
+            }
+
+            function setStatus (msg) { Lisp.call(this, "app:set-status", msg) }
+
+            onTextMessageReceived: {
+                console.log(url + ' response: ' + message);
+                if (socket.url.toString().indexOf('/werkstattlicht/' >= 0)) {
+                    socket.active = false;
+                    tmSocket.running = false;
+                    setStatus(message);
+                }
+            }
+            onStatusChanged: {
+                console.log("send to url " + socket.url);
+                tmSocket.running = true; // timeout for connection
+                if (socket.status == WebSocket.Error)
+                {
+                    rctMsgBox.appendMessage("Error: "
+                                            + socket.url + socket.errorString)
+                    socket.active = false;
+                    tmSocket.running = false;
+                }
+                else if (socket.status == WebSocket.Open)
+                {
+                    console.log("Socket open, sending: ");
+                    socket.sendTextMessage(socket.msg);
+                }
+                else if (socket.status == WebSocket.Closed)
+                {
+                    console.log("Socket closed for " + socket.url)
+                    socket.active = false;
+                    tmSocket.running = false;
+                }
+            }
+        }
+
+
+        Rectangle {//{{{
             id: rctMsgBox
             objectName: "tctMsgBox"
             width: parent.width
@@ -183,6 +237,6 @@ Item {
                 lineHeight: 1.1
                 text: "Waiting..."
             }
-        }
+        }//}}}
     }
 }

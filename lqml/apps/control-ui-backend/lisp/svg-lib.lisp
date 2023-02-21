@@ -290,7 +290,7 @@
                    (fmt10 (+ min-temp (* %di dh-temp)))))
 
     (draw scene (:polyline :points (points arr-x arr-y2))
-          :stroke "lightgreen" :stroke-width 1 :fill "none")
+          :stroke "green" :stroke-width 1 :fill "none")
     (draw scene (:polyline :points (points arr-x arr-y1))
           :stroke "blue" :stroke-width 1 :fill "none")
     (draw scene (:polyline :points (str+ lm "," h-bm-s " " w-lm-s "," h-bm-s))

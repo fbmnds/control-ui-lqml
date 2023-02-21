@@ -31,11 +31,12 @@
         ((search "{ \"r1\" : 0 }" status)
          (update-status "Werkstattlicht AUS" "lightgrey"))
         (t
-         (update-status "Werkstattlicht ..." "lightred"))))
+         (qlog (str+ "in set-status " status))
+         (update-status "Werkstattlicht ..." "red"))))
 
 (defun button-pressed ()
   (update-status "Werkstattlicht ..." "lightyellow")
-  (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/r1"))))
+  (qjs |wslRequest| ui:*wsclient* "/r1")
   (values))                               
 
 (defun werkstattlicht (status)  
@@ -54,4 +55,3 @@
   (when (equal var "svgMsg64")
     (q> |svgMsg64| ui:*rect3* (base64:base64-string-to-string s64)))
   (values))
-

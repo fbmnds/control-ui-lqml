@@ -3,5 +3,6 @@
   (:export
    #:button-pressed
    #:werkstattlicht
+   #:set-status
    #:b64-decode))
 

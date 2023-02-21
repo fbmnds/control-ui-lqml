@@ -32,21 +32,22 @@ Item {
         Button {
             id: button
             objectName: "btnWerkstattLicht"
-
             width: parent.width
             height: 50
-
             text: "Licht"
-
-            function set (clr) {
-                background.color = clr
-            }
-
             background: Rectangle {
                 radius: 12
                 color: "lightblue"
             }
 
+            function set (clr) {
+                background.color = clr
+            }
+
+            function buttonPressed () { Lisp.call(this, "app:button-pressed") }
+
+            function werkstattlicht () { Lisp.call(this, "app:werkstattlicht") }
+            
             Timer {
                 id: tmWerkstattLicht
                 interval: 30000
@@ -54,10 +55,10 @@ Item {
                 running: true
                 triggeredOnStart: true
 
-                onTriggered: Lisp.call(this, "app:werkstattlicht")
+                onTriggered: button.werkstattlicht()
             }
 
-            onPressed: Lisp.call(this, "app:button-pressed")
+            onPressed: button.buttonPressed()
         }
 
         Rectangle {
@@ -173,23 +174,30 @@ Item {
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
                         let wsurl = webSocket.url.toString();
-                        rctMsgBox.setMessage("client :'" + wsurl);
-                        rctMsgBox.appendMessage(src.substring(0,20));
-                        if (wsurl.endsWith('/werkstattlicht/?'))
+                        rctMsgBox.appendMessage("for url: '" + wsurl
+                                                + ' ' + src.substring(0,20));
+                        if (wsurl.endsWith('/werkstattlicht/'))
+                            // '?' omitted in socket.url
                         {
+                            console.log('return on /werkstattlicht/? '
+                                        + rctTempHum.wslStatus);
                             webSocket.sendTextMessage(rctTempHum.wslStatus);
                         }
-                        if (wsurl.endsWith('/werkstattlicht/r1'))
+                        else if (wsurl.endsWith('/werkstattlicht/r1'))
                         {
-                            Lisp.call(this, "app:button-pressed");
+                            console.log('on /werkstattlicht/r1 : button-pressed');
+                            button.buttonPressed();
                         }
-                        if (src.startsWith("<?xml"))
+                        else if (src.startsWith("<?xml"))
                         {
                             svg.source = "data:image/svg+xml;utf8," + src;
                         }
+                        else if (src.startsWith("data:image/svg+xml;utf8,"))
+                        {
+                            svg.source = src;
+                        }
                         else
                         {
-                            //Lisp.call(this, "app:put-svg", src);
                             rctTempHum.setSvgText(src);
                             rctMsgBox.setMessage(rctTempHum.svgMsg);
                         }
@@ -197,7 +205,11 @@ Item {
                     });
                 }
                 onErrorStringChanged: {
-                    svg.source = "svg/simple-example2.svg";
+                    let wsurl = webSocket.url.toString();
+                    if (wsurl.indexOf('/werkstattlicht/') < 0)
+                    {
+                        svg.source = "svg/simple-example2.svg";
+                    }
                 }
             }
 
@@ -217,23 +229,31 @@ Item {
             WebSocket {
                 id: socket
                 url: ""
-
+                active: false
+                
                 onTextMessageReceived: {
                     rctMsgBox.appendMessage(message)
                 }
                 onStatusChanged: {
                     console.log("send to url " + socket.url);
                     tmSocket.running = true; // timeout for connection
-                    if (socket.status == WebSocket.Error) {
-                        rctMsgBox.appendMessage("Error: " + socket.url + socket.errorString)
-                    } else if (socket.status == WebSocket.Open) {
+                    if (socket.status == WebSocket.Error)
+                    {
+                        rctMsgBox.appendMessage("Error: "
+                                                + socket.url + socket.errorString);
+                        socket.active = false;
+                    }
+                    else if (socket.status == WebSocket.Open)
+                    {
                         console.log("Socket open, sending...");
                         socket.sendTextMessage(rctTempHum.wsmsg);
-                    } else if (socket.status == WebSocket.Closed) {
-                        console.log("Socket closed for " + socket.url)
+                    }
+                    else if (socket.status == WebSocket.Closed)
+                    {
+                        console.log("Socket closed for " + socket.url);
+                        socket.active = false;
                     }
                 }
-                active: false
             }
         }
 
