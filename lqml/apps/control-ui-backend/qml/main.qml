@@ -102,7 +102,9 @@ Item {
             property string wsmsg: ""
             property string bcUrl: ""
             property string bcMsg: ""
-            
+
+            property string wslStatus: '{ "r1" : 0 }'
+
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
             }
@@ -139,7 +141,7 @@ Item {
                 running: true
                 triggeredOnStart: true
                 onTriggered: {
-                    console.log('triggered: length ' + rctTempHum.bcQueue.length);
+                    //console.log('triggered: length ' + rctTempHum.bcQueue.length);
                     if (rctTempHum.bcQueue.length > 0)
                     {
                         running = false;
@@ -170,8 +172,17 @@ Item {
 
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
-                        rctMsgBox.setMessage("client :'" + webSocket.url.toString());
+                        let wsurl = webSocket.url.toString();
+                        rctMsgBox.setMessage("client :'" + wsurl);
                         rctMsgBox.appendMessage(src.substring(0,20));
+                        if (wsurl.endsWith('/werkstattlicht/?'))
+                        {
+                            webSocket.sendTextMessage(rctTempHum.wslStatus);
+                        }
+                        if (wsurl.endsWith('/werkstattlicht/r1'))
+                        {
+                            Lisp.call(this, "app:button-pressed");
+                        }
                         if (src.startsWith("<?xml"))
                         {
                             svg.source = "data:image/svg+xml;utf8," + src;
