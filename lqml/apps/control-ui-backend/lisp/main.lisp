@@ -35,14 +35,16 @@
 
 (defun button-pressed ()
   (update-status "Werkstattlicht ..." "lightyellow")
-  (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/r1"))))
+  (set-status (werkstattlicht "/r1"))
   (values))
 
 (let ((current-status "{ \"r1\" : 0 }"))
-  (defun werkstattlicht ()
+  (defun werkstattlicht (slug)
     (update-status "Werkstattlicht ..." "lightyellow")
+    (qlog (str+ *werkstatt-licht* slug))
     (let ((status (ignore-errors
-                   (string-trim '(#\r #\n) (curl (str+ *werkstatt-licht* "/?"))))))
+                   (string-trim '(#\r #\n) (curl (str+ *werkstatt-licht* slug))))))
+      (qlog (str+ "app:werkstattlicht " status))
       (set-status status)
       (cond ((null status)
              (qjs |appendMessage| ui:*wrect* "Error: no response from ESP")

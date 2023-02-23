@@ -46,7 +46,7 @@ Item {
 
             function buttonPressed () { Lisp.call(this, "app:button-pressed") }
 
-            function werkstattlicht () { Lisp.call(this, "app:werkstattlicht") }
+            function werkstattlicht () { Lisp.call(this, "app:werkstattlicht", '/?') }
             
             Timer {
                 id: tmWerkstattLicht
@@ -171,6 +171,11 @@ Item {
                 port: 7700
                 listen: true
 
+                function buttonPressedOnClient ()
+                {
+                    Lisp.call(this, "app:werkstattlicht", '/r1')
+                }
+
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
                         let wsurl = webSocket.url.toString();
@@ -185,8 +190,8 @@ Item {
                         }
                         else if (wsurl.endsWith('/werkstattlicht/r1'))
                         {
-                            console.log('on /werkstattlicht/r1 : button-pressed');
-                            button.buttonPressed();
+                            console.log('on /werkstattlicht/r1 : app:werkstattlicht /r1');
+                            buttonPressedOnClient();
                         }
                         else if (src.startsWith("<?xml"))
                         {
@@ -236,8 +241,11 @@ Item {
                 }
                 onStatusChanged: {
                     console.log("send to url " + socket.url);
-                    tmSocket.running = true; // timeout for connection
-                    if (socket.status == WebSocket.Error)
+                    if (socket.status == WebSocket.Connecting)
+                    {
+                        tmSocket.running = true; // set timeout for current connection
+                    }
+                    else if (socket.status == WebSocket.Error)
                     {
                         rctMsgBox.appendMessage("Error: "
                                                 + socket.url + socket.errorString);
@@ -247,6 +255,10 @@ Item {
                     {
                         console.log("Socket open, sending...");
                         socket.sendTextMessage(rctTempHum.wsmsg);
+                        if (socket.url.toString().endsWith('/svg'))
+                        {
+                            socket.active = false;
+                        }
                     }
                     else if (socket.status == WebSocket.Closed)
                     {
