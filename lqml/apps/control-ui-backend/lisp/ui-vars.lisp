@@ -13,8 +13,8 @@
 (in-package :ui)
 
 (defparameter *main* "main")
-(defparameter *label* "label")
-(defparameter *column* "column")
+(defparameter *header* "header")
+(defparameter *frontpage* "frontpage")
 (defparameter *button* "btnWerkstattLicht")
 (defparameter *rect3* "rctTempHum")
 (defparameter *svg* "svg")

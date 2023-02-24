@@ -4,30 +4,30 @@ import QtQuick.Window 2.15
 import QtCharts 2.0
 import QtWebSockets 1.0
 
-Item {
+Column {
     id: main
     objectName: "main"
     width: Screen.width
     height: Screen.height
 
-    Column {
-        id: column
-        objectName: "column"
-        spacing: 10
-        width: parent.width
-        height: parent.height
-
         Label {
             id: label
-            objectName: "label"
+            objectName: "header"
             font.pixelSize: 22
             width: parent.width
-            height: 40
+            height: 60
 
             text: "Control UI Backend"
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
         }
+
+    Column {
+        id: column
+        objectName: "frontpage"
+        spacing: 10
+        width: parent.width
+        height: parent.height
 
         Button {
             id: button
