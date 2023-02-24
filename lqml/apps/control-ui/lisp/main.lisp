@@ -20,7 +20,7 @@
   (values *svg*))
 
 (defun update-status (text color)
-  (qjs |set| ui:*button* color)
+  (q> |background.color| ui:*button* color)
   (q> |text| ui:*button* text)
   (qsleep 1))
 

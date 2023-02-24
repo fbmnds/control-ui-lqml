@@ -41,11 +41,7 @@ Item {
                 color: "lightblue"
             }
 
-            function set (clr) {
-                background.color = clr
-            }
-
-            onPressed: { Lisp.call(this, "app:button-pressed") }
+            onPressed: Lisp.call("app:button-pressed")
 
             Component.onCompleted: { socket.wslRequest('/?') }
         }
@@ -178,14 +174,12 @@ Item {
                 socket.msg = ':ignore';
             }
 
-            function setStatus (msg) { Lisp.call(this, "app:set-status", msg) }
-
             onTextMessageReceived: {
                 console.log(url + ' response: ' + message);
                 if (socket.url.toString().indexOf('/werkstattlicht/' >= 0)) {
                     socket.active = false;
                     tmSocket.running = false;
-                    setStatus(message);
+                    Lisp.call("app:set-status", message);
                 }
             }
             onStatusChanged: {
