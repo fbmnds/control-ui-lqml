@@ -10,17 +10,116 @@ Column {
     width: Screen.width
     height: Screen.height
 
-        Label {
-            id: label
-            objectName: "header"
-            font.pixelSize: 22
-            width: parent.width
-            height: 60
+    Label {
+        id: label
+        objectName: "header"
+        font.pixelSize: 22
+        width: parent.width
+        height: 60
 
-            text: "Control UI Backend"
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
+        text: "Control UI Backend"
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+    }
+
+    WebSocketServer {
+        id: server
+        host: "0.0.0.0"
+        port: 7700
+        listen: true
+
+        onClientConnected: {
+            webSocket.onTextMessageReceived.connect(function(src) {
+                let wsurl = webSocket.url.toString();
+                rctMsgBox.appendMessage("for url: '" + wsurl
+                                        + ' ' + src.substring(0,20));
+                if (wsurl.endsWith('/werkstattlicht/'))
+                    // '?' omitted in socket.url
+                {
+                    console.log('return on /werkstattlicht/? '
+                                + rctTempHum.wslStatus);
+                    webSocket.sendTextMessage(rctTempHum.wslStatus);
+                }
+                else if (wsurl.endsWith('/werkstattlicht/r1'))
+                {
+                    console.log('on /werkstattlicht/r1 : app:werkstattlicht /r1');
+                    Lisp.call("app:werkstattlicht", '/r1');
+                }
+                else if (src.startsWith("<?xml"))
+                {
+                    svg.source = "data:image/svg+xml;utf8," + src;
+                }
+                else if (src.startsWith("data:image/svg+xml;utf8,"))
+                {
+                    svg.source = src;
+                }
+                else
+                {
+                    rctTempHum.setSvgText(src);
+                    rctMsgBox.setMessage(rctTempHum.svgMsg);
+                }
+                //tmSocket.running = true;
+            });
         }
+        onErrorStringChanged: {
+            let wsurl = webSocket.url.toString();
+            if (wsurl.indexOf('/werkstattlicht/') < 0)
+            {
+                svg.source = "svg/simple-example2.svg";
+            }
+        }
+    }
+
+    WebSocket {
+        id: socket
+        url: ""
+        active: false
+
+        property var timer: Timer {
+            id: tmSocket
+            interval: 3000
+            repeat: false
+            running: false
+            triggeredOnStart: false
+            onTriggered: {
+                console.log("end of transmitt to " + socket.url);
+                socket.active = false;
+                rctTempHum.broadcast();
+            }
+        }
+
+        onTextMessageReceived: {
+            rctMsgBox.appendMessage(message)
+        }
+        onStatusChanged: {
+
+            if (socket.status == WebSocket.Connecting)
+            {
+                console.log("send to url " + socket.url);
+                tmSocket.running = true; // set timeout for current connection
+            }
+            else if (socket.status == WebSocket.Error)
+            {
+                rctMsgBox.appendMessage("Error: "
+                                        + socket.url + socket.errorString);
+                socket.active = false;
+            }
+            else if (socket.status == WebSocket.Open)
+            {
+                console.log("Socket open, sending...");
+                socket.sendTextMessage(rctTempHum.wsmsg);
+                if (socket.url.toString().endsWith('/svg'))
+                {
+                    socket.active = false;
+                }
+            }
+            else if (socket.status == WebSocket.Closed)
+            {
+                console.log("Socket closed for " + socket.url);
+                socket.active = false;
+            }
+        }
+    }
 
     Column {
         id: column
@@ -157,104 +256,6 @@ Column {
                 source: "svg/simple-example2.svg"
             }
 
-            WebSocketServer {
-                id: server
-                host: "0.0.0.0"
-                port: 7700
-                listen: true
-
-                onClientConnected: {
-                    webSocket.onTextMessageReceived.connect(function(src) {
-                        let wsurl = webSocket.url.toString();
-                        rctMsgBox.appendMessage("for url: '" + wsurl
-                                                + ' ' + src.substring(0,20));
-                        if (wsurl.endsWith('/werkstattlicht/'))
-                            // '?' omitted in socket.url
-                        {
-                            console.log('return on /werkstattlicht/? '
-                                        + rctTempHum.wslStatus);
-                            webSocket.sendTextMessage(rctTempHum.wslStatus);
-                        }
-                        else if (wsurl.endsWith('/werkstattlicht/r1'))
-                        {
-                            console.log('on /werkstattlicht/r1 : app:werkstattlicht /r1');
-                            Lisp.call("app:werkstattlicht", '/r1');
-                        }
-                        else if (src.startsWith("<?xml"))
-                        {
-                            svg.source = "data:image/svg+xml;utf8," + src;
-                        }
-                        else if (src.startsWith("data:image/svg+xml;utf8,"))
-                        {
-                            svg.source = src;
-                        }
-                        else
-                        {
-                            rctTempHum.setSvgText(src);
-                            rctMsgBox.setMessage(rctTempHum.svgMsg);
-                        }
-                        //tmSocket.running = true;
-                    });
-                }
-                onErrorStringChanged: {
-                    let wsurl = webSocket.url.toString();
-                    if (wsurl.indexOf('/werkstattlicht/') < 0)
-                    {
-                        svg.source = "svg/simple-example2.svg";
-                    }
-                }
-            }
-
-            Timer {
-                id: tmSocket
-                interval: 3000
-                repeat: false
-                running: false
-                triggeredOnStart: false
-                onTriggered: {
-                    console.log("end of transmitt to " + socket.url);
-                    socket.active = false;
-                    rctTempHum.broadcast();
-                }
-            }
-
-            WebSocket {
-                id: socket
-                url: ""
-                active: false
-
-                onTextMessageReceived: {
-                    rctMsgBox.appendMessage(message)
-                }
-                onStatusChanged: {
-
-                    if (socket.status == WebSocket.Connecting)
-                    {
-                        console.log("send to url " + socket.url);
-                        tmSocket.running = true; // set timeout for current connection
-                    }
-                    else if (socket.status == WebSocket.Error)
-                    {
-                        rctMsgBox.appendMessage("Error: "
-                                                + socket.url + socket.errorString);
-                        socket.active = false;
-                    }
-                    else if (socket.status == WebSocket.Open)
-                    {
-                        console.log("Socket open, sending...");
-                        socket.sendTextMessage(rctTempHum.wsmsg);
-                        if (socket.url.toString().endsWith('/svg'))
-                        {
-                            socket.active = false;
-                        }
-                    }
-                    else if (socket.status == WebSocket.Closed)
-                    {
-                        console.log("Socket closed for " + socket.url);
-                        socket.active = false;
-                    }
-                }
-            }
         }
 
         Rectangle {
