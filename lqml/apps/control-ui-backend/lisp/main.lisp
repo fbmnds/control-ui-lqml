@@ -20,7 +20,7 @@
   (values *svg*))
 
 (defun update-status (text color)
-  (qjs |set| ui:*button* color)
+  (q> |background.color| ui:*button* color)
   (q> |text| ui:*button* text)
   (qsleep 1))
 
@@ -34,12 +34,14 @@
          (update-status "Werkstattlicht ..." "red"))))
 
 (defun button-pressed ()
+  "Respond via broadcast"
   (update-status "Werkstattlicht ..." "lightyellow")
-  (set-status (werkstattlicht "/r1"))
+  (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/r1"))))
   (values))
 
 (let ((current-status "{ \"r1\" : 0 }"))
   (defun werkstattlicht (slug)
+    "Respond via broadcast iff status changed"
     (update-status "Werkstattlicht ..." "lightyellow")
     (qlog (str+ *werkstatt-licht* slug))
     (let ((status (ignore-errors

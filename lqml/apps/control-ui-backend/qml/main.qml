@@ -40,14 +40,6 @@ Item {
                 color: "lightblue"
             }
 
-            function set (clr) {
-                background.color = clr
-            }
-
-            function buttonPressed () { Lisp.call(this, "app:button-pressed") }
-
-            function werkstattlicht () { Lisp.call(this, "app:werkstattlicht", '/?') }
-            
             Timer {
                 id: tmWerkstattLicht
                 interval: 30000
@@ -55,10 +47,10 @@ Item {
                 running: true
                 triggeredOnStart: true
 
-                onTriggered: button.werkstattlicht()
+                onTriggered: Lisp.call("app:werkstattlicht", '/?')
             }
 
-            onPressed: button.buttonPressed()
+            onPressed: Lisp.call("app:button-pressed")
         }
 
         Rectangle {
@@ -121,7 +113,7 @@ Item {
             function addBroadcastEvent (url, msg) {
                 bcQueue.push([url, msg]);
             }
-            
+
             function broadcast() {
                 if (client < clientIP.length)
                 {
@@ -171,11 +163,6 @@ Item {
                 port: 7700
                 listen: true
 
-                function buttonPressedOnClient ()
-                {
-                    Lisp.call(this, "app:werkstattlicht", '/r1')
-                }
-
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
                         let wsurl = webSocket.url.toString();
@@ -191,7 +178,7 @@ Item {
                         else if (wsurl.endsWith('/werkstattlicht/r1'))
                         {
                             console.log('on /werkstattlicht/r1 : app:werkstattlicht /r1');
-                            buttonPressedOnClient();
+                            Lisp.call("app:werkstattlicht", '/r1');
                         }
                         else if (src.startsWith("<?xml"))
                         {
@@ -235,14 +222,15 @@ Item {
                 id: socket
                 url: ""
                 active: false
-                
+
                 onTextMessageReceived: {
                     rctMsgBox.appendMessage(message)
                 }
                 onStatusChanged: {
-                    console.log("send to url " + socket.url);
+
                     if (socket.status == WebSocket.Connecting)
                     {
+                        console.log("send to url " + socket.url);
                         tmSocket.running = true; // set timeout for current connection
                     }
                     else if (socket.status == WebSocket.Error)
