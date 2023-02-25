@@ -45,6 +45,7 @@ Column {
 
     WebSocket {
         id: socket
+        objectName: "socket"
         url: ""
         active: false
 
