@@ -275,7 +275,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../lisp/curl.lisp ../lisp/env.lisp ../lisp/main.lisp ../lisp/package.lisp ../lisp/qml-reload ../lisp/server.lisp ../lisp/svg ../lisp/svg-lib.lisp ../lisp/ui-vars.lisp ../lisp/utils.lisp ../lisp/x.lisp ../app.asd ../make.lisp $(DISTDIR)/
+	$(COPY_FILE) --parents ../lisp/curl.lisp ../lisp/env.lisp ../lisp/main.lisp ../lisp/package.lisp ../lisp/qml-reload ../lisp/svg ../lisp/svg-lib.lisp ../lisp/ui-vars.lisp ../lisp/utils.lisp ../lisp/websocket.lisp ../lisp/x.lisp ../app.asd ../make.lisp $(DISTDIR)/
 	$(COPY_FILE) --parents armeabi-v7a/qmake_qmake_immediate.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /home/dev/Qt/5.15.2/android/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../src/cpp/main.h $(DISTDIR)/
@@ -329,9 +329,6 @@ tmp/libapp.a: ../lisp/package.lisp
 tmp/libapp.a: ../lisp/qml-reload
 	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui-backend/make.lisp
 
-tmp/libapp.a: ../lisp/server.lisp
-	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui-backend/make.lisp
-
 tmp/libapp.a: ../lisp/svg
 	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui-backend/make.lisp
 
@@ -342,6 +339,9 @@ tmp/libapp.a: ../lisp/ui-vars.lisp
 	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui-backend/make.lisp
 
 tmp/libapp.a: ../lisp/utils.lisp
+	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui-backend/make.lisp
+
+tmp/libapp.a: ../lisp/websocket.lisp
 	/home/dev/ecl/android/32bit/ecl-android/../ecl-android-host/bin/ecl -norc -shell /home/dev/control-ui-lqml/lqml/apps/control-ui-backend/make.lisp
 
 tmp/libapp.a: ../lisp/x.lisp

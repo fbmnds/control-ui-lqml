@@ -11,7 +11,7 @@
    #:*wsth-svg*
    #:*svg*
    #:*wsth-list*
-   #:*msgbox*
+   #:*wsth-list-text*
    ))
 
 (in-package :ui)
@@ -26,5 +26,5 @@
 (defparameter *wsth-svg* "wsth_svg")
 (defparameter *svg* "svg")
 (defparameter *wsth-list* "wsth_list")
-(defparameter *msgbox* "txtMsgBox")
+(defparameter *wsth-list-text* "wsth_list_text")
 

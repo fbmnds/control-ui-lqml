@@ -231,16 +231,16 @@ Column {
             color: "lavender"
 
             function appendMessage(message) {
-                txtMsgBox.text += "\n" + message
+                wsth_list_text.text += "\n" + message
             }
 
             function setMessage(message) {
-                txtMsgBox.text = message
+                wsth_list_text.text = message
             }
 
             Text {
-                id: txtMsgBox
-                objectName: "txtMsgBox"
+                id: wsth_list_text
+                objectName: "wsth_list_text"
                 font.pointSize: 12
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
