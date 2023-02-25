@@ -1,18 +1,12 @@
 (defpackage :app
   (:use :cl :qml :cl-svg :parse-float :cl-base64)
-  (:local-nicknames (#:lt #:local-time)
-                    ;;(#:ws #:websocket-driver)
-                    ;;(#:wsd #:websocket-driver-client)
-                    ;;(#:bt #:bordeaux-threads)
-                    ;;(#:lp #:lparallel)
-                    ;;(#:lpq #:lparallel.queue)
-                    )
+  (:local-nicknames (#:lt #:local-time))
   (:export #:button-pressed
            #:werkstattlicht
            #:receive-data
            #:generate-svg
            #:put-svg
            #:b64-decode
-           ))
+           #:websocket-server-connect))
 
 

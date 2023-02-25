@@ -2,17 +2,21 @@
   (:use :cl :qml)
   (:export
    #:*main*
-   #:*label*
+   #:*server*
+   #:*header*
+   #:frontpage
    #:*button*
    #:*rect3*
    #:*svg*
    #:*column*
    #:*wrect*
-   #:*msgbox*))
+   #:*msgbox*
+   #:*wsclient*))
 
 (in-package :ui)
 
 (defparameter *main* "main")
+(defparameter *server* "server")
 (defparameter *header* "header")
 (defparameter *frontpage* "frontpage")
 (defparameter *button* "btnWerkstattLicht")

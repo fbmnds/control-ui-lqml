@@ -7,5 +7,6 @@
                (:file "lisp/utils")
                (:file "lisp/x")
                (:file "lisp/svg-lib")
+               (:file "lisp/server")
                (:file "lisp/main")))
 

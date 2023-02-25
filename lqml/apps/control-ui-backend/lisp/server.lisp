@@ -1,117 +1,70 @@
-#|
-(defpackage :rx
-  (:use :cl)
-  (:local-nicknames (#:a #:alexandria))
-  (:export #:route))
+(in-package :app)
 
-(in-package :rx)
+(defun substring (start end s)
+  "Return the substring of `s' from `start' to `end'.
+It uses `subseq' with differences:
+- argument order, s at the end
+- `start' and `end' can be lower than 0 or bigger than the length of s.
+- for convenience `end' can be nil or t to denote the end of the string.
+"
+  (let* ((s-length (length s))
+         (end (cond
+                ((null end) s-length)
+                ((eq end t) s-length)
+                (t end))))
+    (setf start (max 0 start))
+    (if (> start s-length)
+        ""
+        (progn
+          (setf end (min end s-length))
+          (when (< end (- s-length))
+            (setf end 0))
+          (when (< end 0)
+            (setf end (+ s-length end)))
+          (if (< end start)
+              ""
+              (subseq s start end))))))
 
-(defun route (env-path path rc hdr body &optional ends-with)
-  (when (if ends-with
-            (a:ends-with-subseq path env-path)
-            (a:starts-with-subseq path env-path))
-    (if (pathnamep body)
-        `(,rc ,hdr ,body)
-        `(,rc ,hdr (,body)))))
+(defun starts-with-p (start s &key ignore-case)
+  "Return t if S starts with the substring `START', nil otherwise.
+  START can be a string or a character."
+  (let ((start-length (length (string start))))
+    (when (>= (length s) start-length)
+      (let ((fn (if ignore-case #'string-equal #'string=)))
+        (funcall fn s start :start1 0 :end1 start-length)))))
 
+(defun ends-with-p (end s &key ignore-case)
+  "Return t if s ends with the substring 'end', nil otherwise.
+  END can be a character or a string."
+  (let ((s-length (length s))
+        (end-length (length (string end))))
+    (when (>= s-length end-length)
+      (let ((fn (if ignore-case #'string-equal #'string=)))
+        (funcall fn s end :start1 (- s-length end-length))))))
 
-(in-package :svg-lib)
-
-(defparameter *clack-server* nil)
-(defparameter *svg-thread* nil)
-(defparameter *request-queue* (lpq:make-queue))
-(defparameter *svg-intervall* 5)
-(defparameter *svg-clients* (list "192.168.178.31"))
-
-(defclass request () ())
-
-(defclass broadcast-request (request) ())
-
-(defclass register-request (request)
-  ((url :initarg :url :accessor url)))
-
-(defclass remove-request (request)
-  ((url :initarg :url :accessor url)))
-
-(defgeneric fulfill (request))
-
-(defun send-svg(url)
-  (let* ((svg (generate-svg :string))
-         (url (str+ "ws://" url ":7700/"))
-         (client (wsd:make-client url)))
-    (progn
-     (ws:on :open client (lambda () (format t "~&connected~%")))
-     (ws:on :message client (lambda (message) (format t " ~a" message)))
-     (ws:start-connection client)
-     (ws:send client svg)
-     (sleep 1))
-    (ws:close-connection client)))
-
-(defmethod fulfill ((request broadcast-request))
-  (loop for url in *svg-clients* do (send-svg url)))
-
-(defmethod fulfill ((request register-request))
-  (let ((url (url request)))
-    (unless (member url *svg-clients* :test 'equal)
-      (push url *svg-clients*))))
-
-(defmethod fulfill ((request remove-request))
-  (let ((url (url request))) 
-    (setf *svg-clients*
-          (remove-if (lambda (%url) (equal %url url)) *svg-clients*))))
-
-(defun start-svg-thread ()
-  (setf *svg-thread*
-        (bt:make-thread (lambda ()
-                          (loop when (lpq:queue-empty-p *request-queue*)
-                                  do (sleep *svg-intervall*)
-                                do (fulfill (lpq:pop-queue *request-queue*))))
-                        :name "svg")))
-
-(defun handler (env)
-  (let (;;(js-hdr '(:content-type "application/javascript"))
-        ;;(json-hdr '(:content-type "application/json"))
-        (svg-hdr '(:content-type "image/svg+xml"))
-        ;;(x-icon-hdr '(:content-type "image/x-icon"))
-        ;;(plain-text-hdr '(:content-type "plain/text"))
-        (path (getf env :path-info)))
-    (handler-case
-        (or
-         ;;(rx:route path "/index.html"
-         ;;          200 '(:access-control-allow-origin "*") *index*)
-         ;;#-ecl (rx:route path "/assets/favicon.ico" 200 x-icon-hdr *favicon* t)
-         (when (x:starts-with "/svg" path)
-           (let ((svg (generate-svg :string)))
-             `(200 ,svg-hdr (,svg))))
-         (when (x:starts-with "/register/192.168.178." path)
-           (format t "register")
-           (lpq:push-queue
-            (make-instance 'register-request
-                           :url (subseq path (length "/register/")))
-            *request-queue*)
-           `(200 nil ("")))
-         (when (x:starts-with "/remove/192.168.178." path)
-           (format t "remove")
-           (lpq:push-queue
-            (make-instance 'remove-request
-                           :url (subseq path (length "/remove/")))
-            *request-queue*)
-           `(200 nil ("")))
-         (when (x:starts-with "/broadcast" path)
-           (format t "broadcast")
-           (fulfill (make-instance 'broadcast-request))
-           `(200 nil ("")))
-         `(404 nil (,(format nil "Path not found~%"))))
-      (t (e) (if *debug*
-                 `(500 nil (,(format nil "Internal Server Error~%~A~%" e)))
-                 `(500 nil (,(format nil "Internal Server Error"))))))))
-
-(defun start (handler)
-  (setf *clack-server* 
-        (clack:clackup handler :server :woo :address "0.0.0.0" :port 7000)))
-
-(defun stop ()
-  (prog1
-      (clack:stop *clack-server*)
-    (setf *clack-server* nil)))
-|#
+(defun websocket-server-connect (src socket)
+  (qlog "websocket-server-connect " (substring 0 20 src)
+        " " (q< |objectName| *caller*)
+        " " (q< |objectName| ui:*server*)
+        " " (format nil "~a" (q< |url| socket))
+        " " (format nil "~a" (q< |url| ui:*server*)))
+  (let ((server ui:*server*)
+        (ws-url (format nil "~a" (q< |url| socket))))
+    (q! |appendMessage| ui:*wrect*
+        (str+ "for url: " ws-url " " (substring 0 20 src)))
+    (cond ((ends-with-p "/werkstattlicht/" ws-url) ; '?' omitted in socket.url
+           (let ((wsl-status (q< |wslStatus| ui:*rect3*)))
+             (qlog (str+ "return on /werkstattlicht/? " wsl-status))
+             (q! |sendTextMessage| server wsl-status)))
+          ((ends-with-p "/werkstattlicht/r1" ws-url)
+           (werkstattlicht "/r1"))
+          ((starts-with-p "<?xml" src)
+           (q> |source| ui:*svg* (str+ "data:image/svg+xml;utf8," src)))
+          ((starts-with-p "data:image/svg+xml;utf8," src)
+           (q> |source| ui:*svg* src))
+          ((starts-with-p "[" src)
+           (put-svg src)
+           (q! |setMessage| ui:*wrect* (q< |svgMsg| ui:*rect3*)))
+          (t (q! |setMessage| ui:*wrect* (str+ "ignoring " (substring 0 20 src)
+                                               " for url " ws-url)))))
+  (values))

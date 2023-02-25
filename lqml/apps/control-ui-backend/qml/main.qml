@@ -24,41 +24,14 @@ Column {
 
     WebSocketServer {
         id: server
+        objectName: "server"
         host: "0.0.0.0"
         port: 7700
         listen: true
 
         onClientConnected: {
             webSocket.onTextMessageReceived.connect(function(src) {
-                let wsurl = webSocket.url.toString();
-                rctMsgBox.appendMessage("for url: '" + wsurl
-                                        + ' ' + src.substring(0,20));
-                if (wsurl.endsWith('/werkstattlicht/'))
-                    // '?' omitted in socket.url
-                {
-                    console.log('return on /werkstattlicht/? '
-                                + rctTempHum.wslStatus);
-                    webSocket.sendTextMessage(rctTempHum.wslStatus);
-                }
-                else if (wsurl.endsWith('/werkstattlicht/r1'))
-                {
-                    console.log('on /werkstattlicht/r1 : app:werkstattlicht /r1');
-                    Lisp.call("app:werkstattlicht", '/r1');
-                }
-                else if (src.startsWith("<?xml"))
-                {
-                    svg.source = "data:image/svg+xml;utf8," + src;
-                }
-                else if (src.startsWith("data:image/svg+xml;utf8,"))
-                {
-                    svg.source = src;
-                }
-                else
-                {
-                    rctTempHum.setSvgText(src);
-                    rctMsgBox.setMessage(rctTempHum.svgMsg);
-                }
-                //tmSocket.running = true;
+                Lisp.call("app:websocket-server-connect", src, webSocket)
             });
         }
         onErrorStringChanged: {
@@ -260,7 +233,7 @@ Column {
 
         Rectangle {
             id: rctMsgBox
-            objectName: "txtMsgBox"
+            objectName: "rctMsgBox"
             width: parent.width
             height: 260
             color: "lavender"

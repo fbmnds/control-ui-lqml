@@ -49,10 +49,10 @@
       (qlog (str+ "app:werkstattlicht " status))
       (set-status status)
       (cond ((null status)
-             (qjs |appendMessage| ui:*wrect* "Error: no response from ESP")
+             (q! |appendMessage| ui:*wrect* "Error: no response from ESP")
              (q> |wslStatus| ui:*rect3* ""))
             ((string/= status current-status)
-             (qjs |addBroadcastEvent| ui:*rect3* "/werkstattlicht" status)
+             (q! |addBroadcastEvent| ui:*rect3* "/werkstattlicht" status)
              (q> |wslStatus| ui:*rect3* status)
              (setf current-status status))
             (t :ignore)))
@@ -120,3 +120,4 @@
                  svg-msg-64 "\", \"svg\": \""
                  svg-text-64 "\" }")))        
     (values)))
+
