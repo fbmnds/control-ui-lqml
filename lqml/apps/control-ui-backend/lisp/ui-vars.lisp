@@ -7,8 +7,8 @@
    #:*tm-socket*
    #:*header*
    #:*frontpage*
-   #:*button*
-   #:*rect3*
+   #:*wsl-button*
+   #:*wsth-svg*
    #:*svg*
    #:*wrect*
    #:*msgbox*
@@ -22,8 +22,8 @@
 (defparameter *tm-socket* "tmSocket")
 (defparameter *header* "header")
 (defparameter *frontpage* "frontpage")
-(defparameter *button* "btnWerkstattLicht")
-(defparameter *rect3* "rctTempHum")
+(defparameter *wsl-button* "wsl_button")
+(defparameter *wsth-svg* "wsth_svg")
 (defparameter *svg* "svg")
 (defparameter *wrect* "rctMsgBox")
 (defparameter *msgbox* "txtMsgBox")

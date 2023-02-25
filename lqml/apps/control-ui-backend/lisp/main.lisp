@@ -20,8 +20,8 @@
   (values *svg*))
 
 (defun update-status (text color)
-  (q> |background.color| ui:*button* color)
-  (q> |text| ui:*button* text)
+  (q> |background.color| ui:*wsl-button* color)
+  (q> |text| ui:*wsl-button* text)
   (qsleep 1))
 
 (defun set-status (status)
@@ -50,10 +50,10 @@
       (set-status status)
       (cond ((null status)
              (q! |appendMessage| ui:*wrect* "Error: no response from ESP")
-             (q> |wslStatus| ui:*rect3* ""))
+             (q> |wslStatus| ui:*wsth-svg* ""))
             ((string/= status current-status)
-             (q! |addBroadcastEvent| ui:*rect3* "/werkstattlicht" status)
-             (q> |wslStatus| ui:*rect3* status)
+             (q! |addBroadcastEvent| ui:*wsth-svg* "/werkstattlicht" status)
+             (q> |wslStatus| ui:*wsth-svg* status)
              (setf current-status status))
             (t :ignore)))
     (values)))
@@ -82,8 +82,8 @@
 
 (defun put-svg (data)
   (let ((svg "")
-        (width (q< |width| ui:*rect3*))
-        (height (q< |height| ui:*rect3*))
+        (width (q< |width| ui:*wsth-svg*))
+        (height (q< |height| ui:*wsth-svg*))
         (n 600)
         (m 10)
         (left-right-margin 24)
@@ -109,13 +109,13 @@
         (setf svg *svg*)
         (setf text (format nil "error '~a'" c))
         (qlog (format nil "error '~a'" c))))
-    (q> |svgText| ui:*rect3* (str+ "data:image/svg+xml;utf8," svg))
-    (q> |svgMsg| ui:*rect3* text)
+    (q> |svgText| ui:*wsth-svg* (str+ "data:image/svg+xml;utf8," svg))
+    (q> |svgMsg| ui:*wsth-svg* text)
     (let ((svg-text-64 (base64:string-to-base64-string svg))
           (svg-msg-64 (base64:string-to-base64-string text)))
-      (q> |svgText64| ui:*rect3* svg-text-64)
-      (q> |svgMsg64| ui:*rect3* svg-msg-64)
-      (qjs |addBroadcastEvent| ui:*rect3* "/svg"
+      (q> |svgText64| ui:*wsth-svg* svg-text-64)
+      (q> |svgMsg64| ui:*wsth-svg* svg-msg-64)
+      (qjs |addBroadcastEvent| ui:*wsth-svg* "/svg"
            (str+ "{ \"tag\": \"data\", \"text\": \""
                  svg-msg-64 "\", \"svg\": \""
                  svg-text-64 "\" }")))        

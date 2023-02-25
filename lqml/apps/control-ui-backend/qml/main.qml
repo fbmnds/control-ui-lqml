@@ -59,7 +59,7 @@ Column {
             onTriggered: {
                 console.log("end of transmitt to " + socket.url);
                 socket.active = false;
-                rctTempHum.broadcast();
+                wsth_svg.broadcast();
             }
         }
 
@@ -83,15 +83,19 @@ Column {
     }
 
     Column {
-        id: column
+        id: frontpage
         objectName: "frontpage"
         spacing: 10
         width: parent.width
         height: parent.height
 
+        Item {
+            id: state
+        }
+
         Button {
             id: button
-            objectName: "btnWerkstattLicht"
+            objectName: "wsl_button"
             width: parent.width
             height: 50
             text: "Licht"
@@ -101,7 +105,7 @@ Column {
             }
 
             Timer {
-                id: tmWerkstattLicht
+                id: wsl_timer
                 interval: 30000
                 repeat: true
                 running: true
@@ -138,8 +142,8 @@ Column {
         }
 
         Rectangle {
-            id: rctTempHum
-            objectName: "rctTempHum"
+            id: wsth_svg
+            objectName: "wsth_svg"
             width: parent.width
             height: 200
             color: "lavender"
@@ -165,9 +169,9 @@ Column {
             function triggerTransmitt (client) {
                 console.log("broadcast..." + client + " " + clientIP.length);
                 socket.url = "ws://" + clientIP[client] + ":7700" + bcUrl;
-                rctTempHum.client = client + 1;
+                wsth_svg.client = client + 1;
                 socket.active = true;
-                rctTempHum.wsmsg = bcMsg;
+                wsth_svg.wsmsg = bcMsg;
             }
 
             function addBroadcastEvent (url, msg) {
@@ -194,15 +198,15 @@ Column {
                 running: true
                 triggeredOnStart: true
                 onTriggered: {
-                    //console.log('triggered: length ' + rctTempHum.bcQueue.length);
-                    if (rctTempHum.bcQueue.length > 0)
+                    //console.log('triggered: length ' + wsth_svg.bcQueue.length);
+                    if (wsth_svg.bcQueue.length > 0)
                     {
                         running = false;
-                        let bc = rctTempHum.bcQueue.shift();
+                        let bc = wsth_svg.bcQueue.shift();
                         console.log('url ' + bc[0] + " msg " + bc[1]);
-                        rctTempHum.bcUrl = bc[0];
-                        rctTempHum.bcMsg = bc[1];
-                        rctTempHum.broadcast();
+                        wsth_svg.bcUrl = bc[0];
+                        wsth_svg.bcMsg = bc[1];
+                        wsth_svg.broadcast();
                     }
                 }
             }

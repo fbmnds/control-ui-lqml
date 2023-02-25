@@ -11,7 +11,7 @@
     (q! |appendMessage| ui:*wrect*
         (str+ "for url: " ws-url " " (substring src 0 20)))
     (cond ((x:ends-with "/werkstattlicht/" ws-url) ; '?' omitted in socket.url
-           (let ((wsl-status (q< |wslStatus| ui:*rect3*)))
+           (let ((wsl-status (q< |wslStatus| ui:*wsth-svg*)))
              (qlog (str+ "return on /werkstattlicht/? " wsl-status))
              (q! |sendTextMessage| server wsl-status)))
           ((x:ends-with "/werkstattlicht/r1" ws-url)
@@ -22,7 +22,7 @@
            (q> |source| ui:*svg* src))
           ((x:starts-with "[" src)
            (put-svg src)
-           (q! |setMessage| ui:*wrect* (q< |svgMsg| ui:*rect3*)))
+           (q! |setMessage| ui:*wrect* (q< |svgMsg| ui:*wsth-svg*)))
           (t (q! |setMessage| ui:*wrect* (str+ "ignoring " (substring src 0 20)
                                                " for url " ws-url)))))
   (values))
@@ -46,7 +46,7 @@
           ;;
           ((q< |open| socket)
            (qlog "Socket open, sending...")
-           (q! |sendTextMessage| socket (q< |wsmsg| ui:*rect3*))
+           (q! |sendTextMessage| socket (q< |wsmsg| ui:*wsth-svg*))
            (when (x:ends-with "/svg" url) (q> |active| socket nil)))
           ;;
           ((q< |closing| socket))
