@@ -10,7 +10,7 @@
    #:*wsl-button*
    #:*wsth-svg*
    #:*svg*
-   #:*wrect*
+   #:*wsth-list*
    #:*msgbox*
    ))
 
@@ -25,6 +25,6 @@
 (defparameter *wsl-button* "wsl_button")
 (defparameter *wsth-svg* "wsth_svg")
 (defparameter *svg* "svg")
-(defparameter *wrect* "rctMsgBox")
+(defparameter *wsth-list* "wsth_list")
 (defparameter *msgbox* "txtMsgBox")
 

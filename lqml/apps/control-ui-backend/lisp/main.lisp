@@ -49,7 +49,7 @@
       (qlog (str+ "app:werkstattlicht " status))
       (set-status status)
       (cond ((null status)
-             (q! |appendMessage| ui:*wrect* "Error: no response from ESP")
+             (q! |appendMessage| ui:*wsth-list* "Error: no response from ESP")
              (q> |wslStatus| ui:*wsth-svg* ""))
             ((string/= status current-status)
              (q! |addBroadcastEvent| ui:*wsth-svg* "/werkstattlicht" status)

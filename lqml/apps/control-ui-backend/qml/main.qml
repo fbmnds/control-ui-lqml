@@ -70,7 +70,7 @@ Column {
         property bool error: false
 
         onTextMessageReceived: {
-            rctMsgBox.appendMessage(message)
+            wsth_list.appendMessage(message)
         }
         onStatusChanged: {
             socket.connecting = (socket.status == WebSocket.Connecting);
@@ -212,7 +212,7 @@ Column {
             }
 
             onSvgTextChanged: svg.source = svgText
-            onSvgMsgChanged: rctMsgBox.setMessage(svgText)
+            onSvgMsgChanged: wsth_list.setMessage(svgText)
 
             Image {
                 id: svg
@@ -224,8 +224,8 @@ Column {
         }
 
         Rectangle {
-            id: rctMsgBox
-            objectName: "rctMsgBox"
+            id: wsth_list
+            objectName: "wsth_list"
             width: parent.width
             height: 260
             color: "lavender"

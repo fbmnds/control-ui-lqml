@@ -8,7 +8,7 @@
         " " (format nil "~a" (q< |url| ui:*server*)))
   (let ((server ui:*server*)
         (ws-url (format nil "~a" (q< |url| socket))))
-    (q! |appendMessage| ui:*wrect*
+    (q! |appendMessage| ui:*wsth-list*
         (str+ "for url: " ws-url " " (substring src 0 20)))
     (cond ((x:ends-with "/werkstattlicht/" ws-url) ; '?' omitted in socket.url
            (let ((wsl-status (q< |wslStatus| ui:*wsth-svg*)))
@@ -22,8 +22,8 @@
            (q> |source| ui:*svg* src))
           ((x:starts-with "[" src)
            (put-svg src)
-           (q! |setMessage| ui:*wrect* (q< |svgMsg| ui:*wsth-svg*)))
-          (t (q! |setMessage| ui:*wrect* (str+ "ignoring " (substring src 0 20)
+           (q! |setMessage| ui:*wsth-list* (q< |svgMsg| ui:*wsth-svg*)))
+          (t (q! |setMessage| ui:*wsth-list* (str+ "ignoring " (substring src 0 20)
                                                " for url " ws-url)))))
   (values))
 
@@ -40,7 +40,7 @@
            (q> |running| ui:*tm-socket* t)) ; set timeout for current connection
           ;;
           ((q< |error| socket)
-           (q! |appendMessage| ui:*wrect*
+           (q! |appendMessage| ui:*wsth-list*
                (str+ "Error: " url " " (q< |errorString| socket)))
            (q> |active| socket nil))
           ;;
