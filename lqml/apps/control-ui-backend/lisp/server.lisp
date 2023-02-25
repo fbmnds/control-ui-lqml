@@ -26,3 +26,36 @@
           (t (q! |setMessage| ui:*wrect* (str+ "ignoring " (substring src 0 20)
                                                " for url " ws-url)))))
   (values))
+
+(defun websocket-client-connect ()
+  (qlog "websocket-client-connect"
+        (q< |status| ui:*socket*)
+        (q< |connecting| ui:*socket*)
+        (q< |open| ui:*socket*)
+        (q< |closed| ui:*socket*))
+  (let* ((socket ui:*socket*)
+         (url (q< |url| socket)))
+    (cond ((q< |connecting| socket)
+           (qlog "send to url" url)
+           (q> |running| ui:*tm-socket* t)) ; set timeout for current connection
+          ;;
+          ((q< |error| socket)
+           (q! |appendMessage| ui:*wrect*
+               (str+ "Error: " url " " (q< |errorString| socket)))
+           (q> |active| socket nil))
+          ;;
+          ((q< |open| socket)
+           (qlog "Socket open, sending...")
+           (q! |sendTextMessage| socket (q< |wsmsg| ui:*rect3*))
+           (when (x:ends-with "/svg" url) (q> |active| socket nil)))
+          ;;
+          ((q< |closing| socket))
+          ;;
+          ((q< |closed| socket)
+           (qlog "socket closed for " url)
+           (q> |active| socket nil))
+          ;;
+          (t (qlog "unknown websocket status '"
+                   (q< |status| socket) "' for url" url)
+             (q> |active| socket nil))))
+  (values))

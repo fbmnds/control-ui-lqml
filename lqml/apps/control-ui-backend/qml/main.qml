@@ -51,6 +51,7 @@ Column {
 
         property var timer: Timer {
             id: tmSocket
+            objectName: "tmSocket"
             interval: 3000
             repeat: false
             running: false
@@ -62,36 +63,22 @@ Column {
             }
         }
 
+        property bool connecting: false
+        property bool open: false
+        property bool closing: false
+        property bool closed: false
+        property bool error: false
+
         onTextMessageReceived: {
             rctMsgBox.appendMessage(message)
         }
         onStatusChanged: {
-
-            if (socket.status == WebSocket.Connecting)
-            {
-                console.log("send to url " + socket.url);
-                tmSocket.running = true; // set timeout for current connection
-            }
-            else if (socket.status == WebSocket.Error)
-            {
-                rctMsgBox.appendMessage("Error: "
-                                        + socket.url + socket.errorString);
-                socket.active = false;
-            }
-            else if (socket.status == WebSocket.Open)
-            {
-                console.log("Socket open, sending...");
-                socket.sendTextMessage(rctTempHum.wsmsg);
-                if (socket.url.toString().endsWith('/svg'))
-                {
-                    socket.active = false;
-                }
-            }
-            else if (socket.status == WebSocket.Closed)
-            {
-                console.log("Socket closed for " + socket.url);
-                socket.active = false;
-            }
+            socket.connecting = (socket.status == WebSocket.Connecting);
+            socket.open = (socket.status == WebSocket.Open);
+            socket.closing = (socket.status == WebSocket.Closing);
+            socket.closed = (socket.status == WebSocket.Closed);
+            socket.error = (socket.status == WebSocket.Error);
+            Lisp.call("websocket-client-connect");
         }
     }
 

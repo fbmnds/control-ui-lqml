@@ -7,6 +7,7 @@
            #:generate-svg
            #:put-svg
            #:b64-decode
-           #:websocket-server-connect))
+           #:websocket-server-connect
+           #:websocket-client-connect))
 
 

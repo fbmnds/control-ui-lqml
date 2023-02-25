@@ -4,8 +4,9 @@
    #:*main*
    #:*server*
    #:*socket*
+   #:*tm-socket*
    #:*header*
-   #:frontpage
+   #:*frontpage*
    #:*button*
    #:*rect3*
    #:*svg*
@@ -18,6 +19,7 @@
 (defparameter *main* "main")
 (defparameter *server* "server")
 (defparameter *socket* "socket")
+(defparameter *tm-socket* "tmSocket")
 (defparameter *header* "header")
 (defparameter *frontpage* "frontpage")
 (defparameter *button* "btnWerkstattLicht")
