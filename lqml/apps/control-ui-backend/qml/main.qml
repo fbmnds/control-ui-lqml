@@ -89,10 +89,6 @@ Column {
         width: parent.width
         height: parent.height
 
-        Item {
-            id: state
-        }
-
         Button {
             id: button
             objectName: "wsl_button"
@@ -248,5 +244,29 @@ Column {
                 text: "Waiting...\n"
             }
         }
+
+        property string mWsthSvg: ''
+        property string mWsthList: ''
+        
+        property string mWsthSvg64: ''
+        property string mWsthList64: ''
+        property string mWslStatus: "WAIT" // ON OFF ERR        
+        property string jsonModel: '{}'
+
+        function jsonModelUpdate () {
+            wsth_svg.jsonModel =
+                '{ "wsthSvg64": "' + wsth_svg.mWsthSvg64 +
+                '", "wsthList64": "' + wsth_svg.mWsthList64 +
+                '", "wslStatus": "' + wsth_svg.mWslStatus +
+                '" }'
+        }
+        onMWsthSvgChanged : Lisp.call("app:b64-encode", wsth_svg,
+                                      "mWsthSvg64", wsth_svg.mWsthSvg)
+        onMWsthListChanged : Lisp.call("app:b64-encode", wsth_svg,
+                                       "mWsthList64", wsth_svg.mWsthList)
+        
+        onMWsthSvg64Changed : jsonModelUpdate()
+        onMWsthList64Changed : jsonModelUpdate()
+        onMWslStatusChanged : jsonModelUpdate()
     }
 }
