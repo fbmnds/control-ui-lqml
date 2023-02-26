@@ -45,9 +45,10 @@
            (q> |active| socket nil))
           ;;
           ((q< |open| socket)
-           (qlog "Socket open, sending...")
-           (q! |sendTextMessage| socket (q< |wsmsg| ui:*wsth-svg*))
-           (when (x:ends-with "/svg" url) (q> |active| socket nil)))
+           (qlog "socket open, sending...")
+           (q! |sendTextMessage| socket (q< |msg| socket))
+           (q> |active| socket nil)
+           (q! |broadcast| ui:*wsth-svg*))
           ;;
           ((q< |closing| socket))
           ;;

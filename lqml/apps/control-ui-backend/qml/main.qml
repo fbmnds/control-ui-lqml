@@ -49,7 +49,7 @@ Column {
         url: ""
         active: false
 
-        property var timer: Timer {
+        Timer {
             id: tmSocket
             objectName: "tmSocket"
             interval: 3000
@@ -57,7 +57,7 @@ Column {
             running: false
             triggeredOnStart: false
             onTriggered: {
-                console.log("end of transmitt to " + socket.url);
+                console.log("connection timeout for " + socket.url);
                 socket.active = false;
                 wsth_svg.broadcast();
             }
@@ -69,6 +69,9 @@ Column {
         property bool closed: false
         property bool error: false
 
+        property string msg: '{}'
+
+        onMsgChanged: wsth_svg.broadcast()
         onTextMessageReceived: {
             wsth_list.appendMessage(message)
         }
@@ -124,7 +127,6 @@ Column {
                 font.pointSize: 12
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-
             }
 
             Timer {
@@ -144,66 +146,37 @@ Column {
             height: 200
             color: "lavender"
 
-            property string svgText: ""
-            property string svgText64: ""
-            property string svgMsg: ""
-            property string svgMsg64: ""
-
-            property var bcQueue: []
             property var clientIP: ["192.168.178.23", "192.168.178.31"]
             property int client: 0
-            property string wsmsg: ""
-            property string bcUrl: ""
-            property string bcMsg: ""
-
-            property string wslStatus: '{ "r1" : 0 }'
-
+            
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
             }
 
-            function triggerTransmitt (client) {
-                console.log("broadcast..." + client + " " + clientIP.length);
-                socket.url = "ws://" + clientIP[client] + ":7700" + bcUrl;
-                wsth_svg.client = client + 1;
-                socket.active = true;
-                wsth_svg.wsmsg = bcMsg;
-            }
-
-            function addBroadcastEvent (url, msg) {
-                bcQueue.push([url, msg]);
-            }
-
             function broadcast() {
-                if (client < clientIP.length)
+                if (client < (2 * clientIP.length - 1))
                 {
-                    triggerTransmitt(client);
+                    // on connecting: tmSocket.running = true;
+                    socket.url = "ws://"
+                        + clientIP[client % clientIP.length] + ":7700/werkstatt/status";
+                    socket.active = true;
+                    client += 1;
                 }
                 else
                 {
                     client = 0;
-                    tmSocket.running = false;
-                    tmBroadcast.running = true;
+                    socket.active = false;
                 }
             }
 
-            Timer {
-                id: tmBroadcast
-                interval: 3000
-                repeat: true
-                running: true
-                triggeredOnStart: true
-                onTriggered: {
-                    //console.log('triggered: length ' + wsth_svg.bcQueue.length);
-                    if (wsth_svg.bcQueue.length > 0)
-                    {
-                        running = false;
-                        let bc = wsth_svg.bcQueue.shift();
-                        console.log('url ' + bc[0] + " msg " + bc[1]);
-                        wsth_svg.bcUrl = bc[0];
-                        wsth_svg.bcMsg = bc[1];
-                        wsth_svg.broadcast();
-                    }
+            function broadcastCycle() {
+                if (bcCycle < 1)
+                {
+                    bcCycle = 1;
+                }
+                else
+                {
+                    bcCycle = 2;
                 }
             }
 
@@ -216,7 +189,6 @@ Column {
                 anchors.centerIn: parent
                 source: "svg/simple-example2.svg"
             }
-
         }
 
         Rectangle {
@@ -247,24 +219,23 @@ Column {
 
         property string mWsthSvg: ''
         property string mWsthList: ''
-        
+
         property string mWsthSvg64: ''
         property string mWsthList64: ''
         property string mWslStatus: "WAIT" // ON OFF ERROR
-        property string jsonModel: '{}'
 
         function jsonModelUpdate () {
-            wsth_svg.jsonModel =
-                '{ "wsthSvg64": "' + wsth_svg.mWsthSvg64 +
-                '", "wsthList64": "' + wsth_svg.mWsthList64 +
-                '", "wslStatus": "' + wsth_svg.mWslStatus +
-                '" }'
+            socket.msg =
+                '{ "wsthSvg64": "' + mWsthSvg64 +
+                '", "wsthList64": "' + mWsthList64 +
+                '", "wslStatus": "' + mWslStatus +
+                '" }';
         }
         onMWsthSvgChanged : Lisp.call("app:b64-encode", wsth_svg,
                                       "mWsthSvg64", wsth_svg.mWsthSvg)
         onMWsthListChanged : Lisp.call("app:b64-encode", wsth_svg,
                                        "mWsthList64", wsth_svg.mWsthList)
-        
+
         onMWsthSvg64Changed : jsonModelUpdate()
         onMWsthList64Changed : jsonModelUpdate()
         onMWslStatusChanged : jsonModelUpdate()
@@ -281,10 +252,10 @@ Column {
             State {
                 name: "OFF"
                 PropertyChanges {
-                    target: button; 
+                    target: button;
                     text: "Werkstattlicht AUS";
                     background.color: "lightgrey"
-                    
+
                 }
             },
             State {

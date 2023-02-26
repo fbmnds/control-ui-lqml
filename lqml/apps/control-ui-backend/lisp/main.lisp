@@ -13,7 +13,7 @@
                      "<rect width=\"100%\" height=\"100%\" fill=\"lavender\" />"
                      "<circle cx=\"150\" cy=\"100\" r=\"80\" fill=\"lightgrey\" />"
                      "<text x=\"150\" y=\"125\" font-size=\"60\""
-                     " text-anchor=\"middle\" fill=\"green\">SVG</text></svg>"))
+                     " text-anchor=\"middle\" fill=\"red\">SVG</text></svg>"))
 (defvar *svg* (str+ "data:image/svg+xml;utf8," *svg2*))
 
 ;;(defun img () (values *svg*))
@@ -61,43 +61,35 @@
             (gethash "state" ht))))
 
 (defun put-svg (data)
-  (let ((svg "")
-        (width (q< |width| ui:*wsth-svg*))
-        (height (q< |height| ui:*wsth-svg*))
-        (n 600)
-        (m 10)
-        (left-right-margin 24)
-        (bottom-margin 14)
-        (lbl-width 60)
-        text)
-    (handler-case
-        (progn (set-input-parameter :width width :n n :height height :m m
-                                    :left-right-margin left-right-margin
-                                    :bottom-margin bottom-margin
-                                    :lbl-width lbl-width)
-               (receive-data data)
-               (loop for i from 0 to (1- *n-messages*)
-                     do (if (< i (length *data*))
-                            (setf (aref *messages* i) (format-ht (nth i *data*)))
-                            (setf (aref *messages* i) nil)))
-               (prepare-data)
-               (set-parameter)
-               (transform-data)
-               (setf svg (str+ svg (draw-svg :output :string)))
-               (setf text (lines)))
-      (condition (c)
-        (setf svg *svg*)
-        (setf text (format nil "error '~a'" c))
-        (qlog (format nil "error '~a'" c))))
-    (q> |svgText| ui:*wsth-svg* (str+ "data:image/svg+xml;utf8," svg))
-    (q> |svgMsg| ui:*wsth-svg* text)
-    (let ((svg-text-64 (base64:string-to-base64-string svg))
-          (svg-msg-64 (base64:string-to-base64-string text)))
-      (q> |svgText64| ui:*wsth-svg* svg-text-64)
-      (q> |svgMsg64| ui:*wsth-svg* svg-msg-64)
-      (qjs |addBroadcastEvent| ui:*wsth-svg* "/svg"
-           (str+ "{ \"tag\": \"data\", \"text\": \""
-                 svg-msg-64 "\", \"svg\": \""
-                 svg-text-64 "\" }")))        
-    (values)))
+  let ((svg "")
+       (width (q< |width| ui:*wsth-svg*))
+       (height (q< |height| ui:*wsth-svg*))
+       (n 600)
+       (m 10)
+       (left-right-margin 24)
+       (bottom-margin 14)
+       (lbl-width 60)
+       text)
+  (handler-case
+      (progn (set-input-parameter :width width :n n :height height :m m
+                                  :left-right-margin left-right-margin
+                                  :bottom-margin bottom-margin
+                                  :lbl-width lbl-width)
+             (receive-data data)
+             (loop for i from 0 to (1- *n-messages*)
+                   do (if (< i (length *data*))
+                          (setf (aref *messages* i) (format-ht (nth i *data*)))
+                          (setf (aref *messages* i) nil)))
+             (prepare-data)
+             (set-parameter)
+             (transform-data)
+             (setf svg (str+ svg (draw-svg :output :string)))
+             (setf text (lines)))
+    (condition (c)
+      (setf svg *svg*)
+      (setf text (format nil "error '~a'" c))
+      (qlog (format nil "error '~a'" c))))
+  (q> |mWsthSvg| ui:*wsth-svg* (str+ "data:image/svg+xml;utf8," svg))
+  (q> |mWsthList| ui:*wsth-svg* text)
+  (values))
 
