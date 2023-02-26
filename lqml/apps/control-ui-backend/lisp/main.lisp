@@ -16,46 +16,26 @@
                      " text-anchor=\"middle\" fill=\"green\">SVG</text></svg>"))
 (defvar *svg* (str+ "data:image/svg+xml;utf8," *svg2*))
 
-(defun img ()
-  (values *svg*))
+;;(defun img () (values *svg*))
 
-(defun update-status (text color)
-  (q> |background.color| ui:*wsl-button* color)
-  (q> |text| ui:*wsl-button* text)
-  (qsleep 1))
-
-(defun set-status (status)
-  (qlog (format nil "status ~A ~A" (local-time:now) status))
-  (cond ((search "{ \"r1\" : 1 }" status)
-         (update-status "Werkstattlicht AN" "lightgreen"))
-        ((search "{ \"r1\" : 0 }" status)
-         (update-status "Werkstattlicht AUS" "lightgrey"))
-        (t
-         (update-status "Werkstattlicht ..." "red"))))
-
-(defun button-pressed ()
-  "Respond via broadcast"
-  (update-status "Werkstattlicht ..." "lightyellow")
-  (ignore-errors (set-status (curl (str+ *werkstatt-licht* "/r1"))))
-  (values))
+(defun frontpage-state (state) (q> |state| ui:*frontpage* state))
 
 (let ((current-status "{ \"r1\" : 0 }"))
   (defun werkstattlicht (slug)
     "Respond via broadcast iff status changed"
-    (update-status "Werkstattlicht ..." "lightyellow")
-    (qlog (str+ *werkstatt-licht* slug))
+    (frontpage-state "WAIT")
+    (qlog *werkstatt-licht* slug)
     (let ((status (ignore-errors
                    (string-trim '(#\r #\n) (curl (str+ *werkstatt-licht* slug))))))
-      (qlog (str+ "app:werkstattlicht " status))
-      (set-status status)
       (cond ((null status)
-             (q! |appendMessage| ui:*wsth-list* "Error: no response from ESP")
+             (frontpage-state "ERROR")
              (q> |wslStatus| ui:*wsth-svg* ""))
-            ((string/= status current-status)
-             (q! |addBroadcastEvent| ui:*wsth-svg* "/werkstattlicht" status)
-             (q> |wslStatus| ui:*wsth-svg* status)
-             (setf current-status status))
-            (t :ignore)))
+            ((search "{ \"r1\" : 1 }" status) (frontpage-state "ON"))
+            ((search "{ \"r1\" : 0 }" status) (frontpage-state "OFF") )
+            (t (qlog "app:werkstattlicht: unexpected status" status)))
+      (when (string/= status current-status)
+        (q! |addBroadcastEvent| ui:*wsth-svg* "/werkstattlicht" status)
+        (setf current-status status)))
     (values)))
 
 (defparameter *n-messages* 12)

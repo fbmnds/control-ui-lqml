@@ -110,7 +110,7 @@ Column {
                 onTriggered: Lisp.call("app:werkstattlicht", '/?')
             }
 
-            onPressed: Lisp.call("app:button-pressed")
+            onPressed: Lisp.call("app:werkstattlicht", '/r1')
         }
 
         Rectangle {
@@ -250,7 +250,7 @@ Column {
         
         property string mWsthSvg64: ''
         property string mWsthList64: ''
-        property string mWslStatus: "WAIT" // ON OFF ERR        
+        property string mWslStatus: "WAIT" // ON OFF ERROR
         property string jsonModel: '{}'
 
         function jsonModelUpdate () {
@@ -268,5 +268,48 @@ Column {
         onMWsthSvg64Changed : jsonModelUpdate()
         onMWsthList64Changed : jsonModelUpdate()
         onMWslStatusChanged : jsonModelUpdate()
+
+        states: [
+            State {
+                name: "ON"
+                PropertyChanges {
+                    target: button;
+                    text: "Werkstattlicht AN";
+                    background.color: "lightgreen"
+                }
+            },
+            State {
+                name: "OFF"
+                PropertyChanges {
+                    target: button; 
+                    text: "Werkstattlicht AUS";
+                    background.color: "lightgrey"
+                    
+                }
+            },
+            State {
+                name: "WAIT"
+                PropertyChanges {
+                    target: button;
+                    text: "Werkstattlicht ...";
+                    background.color: "lightyellow"
+                }
+            },
+            State {
+                name: "ERROR"
+                PropertyChanges {
+                    target: button;
+                    text: "Werkstattlicht FEHLER";
+                    background.color: "lightpink"
+                }
+            }
+        ]
+
+        transitions: [
+            Transition {
+                from: "*"; to: "*"
+                PropertyAction { target: button; properties: "text,background.color" }
+            }
+        ]
     }
 }
