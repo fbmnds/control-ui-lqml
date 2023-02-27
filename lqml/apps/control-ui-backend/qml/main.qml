@@ -121,10 +121,16 @@ Column {
                 running: true
                 triggeredOnStart: true
 
-                onTriggered: Lisp.call("app:werkstattlicht", '/?')
+                onTriggered: {
+                    frontpage.state = 'WAIT';
+                    Lisp.call("app:werkstattlicht", '/?');
+                }
             }
 
-            onPressed: Lisp.call("app:werkstattlicht", '/r1')
+            onPressed: {
+                frontpage.state = 'WAIT';
+                Lisp.call("app:werkstattlicht", '/r1');
+            }
         }
 
         Rectangle {
@@ -157,9 +163,9 @@ Column {
             height: 200
             color: "lavender"
 
-            property var clientIP: ["192.168.178.23", "192.168.178.31"]
+            property var clientIP: ["192.168.178.31", "192.168.178.23"]
             property int client: -1 // not broadcasting
-            
+
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
             }

@@ -6,14 +6,14 @@
         " " (q< |objectName| ui:*server*)
         " " (format nil "~a" (q< |url| socket))
         " " (format nil "~a" (q< |url| ui:*server*)))
-  (let ((server ui:*server*)
+  (let (;;(server ui:*server*)
         (ws-url (format nil "~a" (q< |url| socket))))
     (q! |appendMessage| ui:*wsth-list*
         (str+ "for url: " ws-url " " (substring src 0 20)))
     (cond ((x:ends-with "/werkstattlicht/" ws-url) ; '?' omitted in socket.url
-           (let ((wsl-status (q< |wslStatus| ui:*wsth-svg*)))
+           (let ((wsl-status (q< |msg| ui:*socket*)))
              (qlog (str+ "return on /werkstattlicht/? " wsl-status))
-             (q! |sendTextMessage| server wsl-status)))
+             (q! |sendTextMessage| socket wsl-status)))
           ((x:ends-with "/werkstattlicht/r1" ws-url)
            (werkstattlicht "/r1"))
           ((x:starts-with "<?xml" src)
@@ -50,14 +50,16 @@
            (broadcast-next-client socket))
           ;;
           ((q< |open| socket)
-           (qlog "socket open, sending...")
+           (qlog "socket open, sending..." (substring (q< |msg| socket) 0 20))
            (q! |sendTextMessage| socket (q< |msg| socket))
-           (broadcast-next-client socket))
+           ;;(broadcast-next-client socket)
+           )
           ;;
           ((q< |closing| socket))
           ;;
           ((q< |closed| socket)
            (qlog "socket closed for " url)
+           (broadcast-next-client socket)
            ;; broadcast-next-client triggered in either |open| or |error|
            )
           ;; should never happen:

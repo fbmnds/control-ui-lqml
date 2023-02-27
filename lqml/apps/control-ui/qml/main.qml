@@ -88,10 +88,11 @@ Item {
 
             onSvgTextChanged: b64Decode("svgText64", svgText);
             onSvgText64Changed: {
-                        //b64Decode(svgText);
-                        console.log(svgText64.substring(0,30));
-                        svg.source = "data:image/svg+xml;utf8," + svgText64;
-}
+                //b64Decode(svgText);
+                console.log(svgText64.substring(0,30));
+                //svg.source = "data:image/svg+xml;utf8," + svgText64;
+                svg.source = svgText64;
+            }
             onSvgMsgChanged: b64Decode("svgMsg64", svgMsg);
             onSvgMsg64Changed: rctMsgBox.setMessage(svgMsg64)
 
@@ -115,9 +116,17 @@ Item {
                 onClientConnected: {
                     webSocket.onTextMessageReceived.connect(function(src) {
                         //rctMsgBox.setMessage("connected");
-                        rctMsgBox.appendMessage(src.substring(0,30));
+                        //rctMsgBox.appendMessage(src.substring(0,30));
                         let wsurl = webSocket.url.toString();
-                        if (wsurl.indexOf('/werkstattlicht') >= 0)
+                        if (wsurl.endsWith('/werkstatt/status'))
+                        {
+                            console.log('received /werkstatt/status');
+                            let jsrc = JSON.parse(src);
+                            column.state = jsrc.wslStatus;
+                            rctTempHum.b64Decode("svgText64", jsrc.wsthSvg64);
+                            rctTempHum.b64Decode("svgMsg64", jsrc.wsthList64);
+                        }
+                        else if (wsurl.indexOf('/werkstattlicht') >= 0)
                         {
                             updateWerkstattlicht(src);
                         }
@@ -179,7 +188,11 @@ Item {
                 if (socket.url.toString().indexOf('/werkstattlicht/' >= 0)) {
                     socket.active = false;
                     tmSocket.running = false;
-                    Lisp.call("app:set-status", message);
+                    let jsrc = JSON.parse(message);
+                    column.state = jsrc.wslStatus;
+                    rctTempHum.b64Decode("svgText64", jsrc.wsthSvg64);
+                    rctTempHum.b64Decode("svgMsg64", jsrc.wsthList64);
+                    ;
                 }
             }
             onStatusChanged: {
@@ -232,5 +245,48 @@ Item {
                 text: "Waiting..."
             }
         }//}}}
+
+        states: [
+            State {
+                name: "ON"
+                PropertyChanges {
+                    target: button;
+                    text: "Werkstattlicht AN";
+                    background.color: "lightgreen"
+                }
+            },
+            State {
+                name: "OFF"
+                PropertyChanges {
+                    target: button;
+                    text: "Werkstattlicht AUS";
+                    background.color: "lightgrey"
+
+                }
+            },
+            State {
+                name: "WAIT"
+                PropertyChanges {
+                    target: button;
+                    text: "Werkstattlicht ...";
+                    background.color: "lightyellow"
+                }
+            },
+            State {
+                name: "ERROR"
+                PropertyChanges {
+                    target: button;
+                    text: "Werkstattlicht FEHLER";
+                    background.color: "lightpink"
+                }
+            }
+        ]
+
+        transitions: [
+            Transition {
+                from: "*"; to: "*"
+                PropertyAction { target: button; properties: "text,background.color" }
+            }
+        ]
     }
 }
