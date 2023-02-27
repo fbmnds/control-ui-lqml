@@ -225,10 +225,13 @@ Column {
 
         property string mWsthSvg64: ''
         property string mWsthList64: ''
-        property string mWslStatus: "WAIT" // ON OFF ERROR
+        property string mWslStatus: 'WAIT' // ON OFF ERROR
 
         function jsonModelUpdate () {
-            console.log('jsonModelUpdate');
+            console.log('jsonModelUpdate '
+                        + mWslStatus + ' '
+                        + mWsthSvg64.substring(0,20) + ' '
+                        + mWsthList64.substring(0,20));
             socket.msg =
                 '{ "wsthSvg64": "' + mWsthSvg64 +
                 '", "wsthList64": "' + mWsthList64 +
@@ -236,11 +239,11 @@ Column {
                 '" }';
         }
         onMWsthSvgChanged : {
-            Lisp.call("app:b64-encode", frontpage, "mWsthSvg64", mWsthSvg);
+            Lisp.call("app:b64-encode", "frontpage", "mWsthSvg64", mWsthSvg);
             svg.source = mWsthSvg;
         }
         onMWsthListChanged : {
-            Lisp.call("app:b64-encode", frontpage, "mWsthList64", mWsthList);
+            Lisp.call("app:b64-encode", "frontpage", "mWsthList64", mWsthList);
             wsth_list_text.text = mWsthList;
         }
         onMWsthSvg64Changed : jsonModelUpdate()

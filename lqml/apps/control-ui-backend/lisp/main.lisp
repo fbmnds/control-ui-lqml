@@ -20,10 +20,11 @@
 
 
 
-(let ((current-state "OFF"))
+(let ((current-state (q< |mWslStatus| ui:*frontpage*)))
   (defun frontpage-state (state)
-    (when (string/= state current-state)
-      (q> |state| ui:*frontpage* state)
+    (q> |state| ui:*frontpage* state)
+    (when (and (string/= "WAIT" state)
+               (string/= state current-state))
       (q> |mWslStatus| ui:*frontpage* state)
       (setf current-state state)))
   (defun werkstattlicht (slug)

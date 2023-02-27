@@ -27,15 +27,13 @@ It uses `subseq' with differences:
               ""
               (subseq s start end))))))
 
-(defun b64-encode (qt-object property text)
-  (let ((text64 (base64:string-to-base64-string text))
-        (name (make-symbol property)))
-    (qset qt-object name text64)))
+(defun b64-encode (object-name property text)
+  (qml-set object-name property (base64:string-to-base64-string text))
+  (values))
 
 (defun b64-decode (qt-object property text64)
-  (let ((text (base64:base64-string-to-string text64))
-        (name (make-symbol property)))
-    (qset qt-object name text)))
+  (qml-set object-name property (base64:base64-string-to-string text64))
+  (values))
 
 (defun read-file (file)
   (with-open-file (s (merge-pathnames file (or *compile-file-truename*
