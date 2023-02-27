@@ -163,7 +163,7 @@ Column {
             height: 200
             color: "lavender"
 
-            property var clientIP: ["192.168.178.31", "192.168.178.23"]
+            property var clientIP: ["192.168.178.31", "192.168.178.23", "192.168.178.20"]
             property int client: -1 // not broadcasting
 
             function setSvgText (src) {
