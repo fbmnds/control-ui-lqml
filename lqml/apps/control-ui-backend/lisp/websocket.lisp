@@ -27,6 +27,11 @@
                                                " for url " ws-url)))))
   (values))
 
+(defun broadcast-next-client (socket)
+  (q> |active| socket nil)
+  (q> |timer.running| socket nil)
+  (q! |broadcast| ui:*wsth-svg*))
+
 (defun websocket-client-connect ()
   (qlog "websocket-client-connect"
         (q< |status| ui:*socket*)
@@ -42,21 +47,21 @@
           ((q< |error| socket)
            (q! |appendMessage| ui:*wsth-list*
                (str+ "Error: " url " " (q< |errorString| socket)))
-           (q> |active| socket nil))
+           (broadcast-next-client socket))
           ;;
           ((q< |open| socket)
            (qlog "socket open, sending...")
            (q! |sendTextMessage| socket (q< |msg| socket))
-           (q> |active| socket nil)
-           (q! |broadcast| ui:*wsth-svg*))
+           (broadcast-next-client socket))
           ;;
           ((q< |closing| socket))
           ;;
           ((q< |closed| socket)
            (qlog "socket closed for " url)
-           (q> |active| socket nil))
-          ;;
+           ;; broadcast-next-client triggered in either |open| or |error|
+           )
+          ;; should never happen:
           (t (qlog "unknown websocket status '"
                    (q< |status| socket) "' for url" url)
-             (q> |active| socket nil))))
+             (broadcast-next-client socket))))
   (values))

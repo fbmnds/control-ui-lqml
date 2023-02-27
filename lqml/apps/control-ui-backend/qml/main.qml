@@ -49,7 +49,7 @@ Column {
         url: ""
         active: false
 
-        Timer {
+        property var timer: Timer {
             id: tmSocket
             objectName: "tmSocket"
             interval: 3000
@@ -59,6 +59,7 @@ Column {
             onTriggered: {
                 console.log("connection timeout for " + socket.url);
                 socket.active = false;
+                wsth_svg.client += 1;
                 wsth_svg.broadcast();
             }
         }
@@ -71,7 +72,17 @@ Column {
 
         property string msg: '{}'
 
-        onMsgChanged: wsth_svg.broadcast()
+        onMsgChanged: {
+            if (wsth_svg.client < 0)
+            {
+                wsth_svg.client = 0;
+                wsth_svg.broadcast();
+            }
+            else if (wsth_svg.client > wsth_svg.clientIP.length)
+            {
+                wsth_svg.client -= wsth_svg.clientIP.length;
+            }
+        }
         onTextMessageReceived: {
             wsth_list.appendMessage(message)
         }
@@ -147,41 +158,33 @@ Column {
             color: "lavender"
 
             property var clientIP: ["192.168.178.23", "192.168.178.31"]
-            property int client: 0
+            property int client: -1 // not broadcasting
             
             function setSvgText (src) {
                 Lisp.call(this, "app:put-svg", src);
             }
 
             function broadcast() {
-                if (client < (2 * clientIP.length - 1))
+                if (client < 0)
                 {
-                    // on connecting: tmSocket.running = true;
-                    socket.url = "ws://"
-                        + clientIP[client % clientIP.length] + ":7700/werkstatt/status";
-                    socket.active = true;
-                    client += 1;
-                }
-                else
-                {
-                    client = 0;
+                    // end broadcasting
                     socket.active = false;
                 }
-            }
-
-            function broadcastCycle() {
-                if (bcCycle < 1)
+                else if (client < (2 * clientIP.length - 1))
                 {
-                    bcCycle = 1;
+                    // already done on Connecting: tmSocket.running = true;
+                    socket.url = "ws://"
+                        + clientIP[client % clientIP.length] + ":7700/werkstatt/status";
+                    client += 1;
+                    socket.active = true;
                 }
                 else
                 {
-                    bcCycle = 2;
+                    client = -1;
+                    socket.active = false;
+                    tmSocket.running = false;
                 }
             }
-
-            onSvgTextChanged: svg.source = svgText
-            onSvgMsgChanged: wsth_list.setMessage(svgText)
 
             Image {
                 id: svg
@@ -225,17 +228,21 @@ Column {
         property string mWslStatus: "WAIT" // ON OFF ERROR
 
         function jsonModelUpdate () {
+            console.log('jsonModelUpdate');
             socket.msg =
                 '{ "wsthSvg64": "' + mWsthSvg64 +
                 '", "wsthList64": "' + mWsthList64 +
                 '", "wslStatus": "' + mWslStatus +
                 '" }';
         }
-        onMWsthSvgChanged : Lisp.call("app:b64-encode", wsth_svg,
-                                      "mWsthSvg64", wsth_svg.mWsthSvg)
-        onMWsthListChanged : Lisp.call("app:b64-encode", wsth_svg,
-                                       "mWsthList64", wsth_svg.mWsthList)
-
+        onMWsthSvgChanged : {
+            Lisp.call("app:b64-encode", frontpage, "mWsthSvg64", mWsthSvg);
+            svg.source = mWsthSvg;
+        }
+        onMWsthListChanged : {
+            Lisp.call("app:b64-encode", frontpage, "mWsthList64", mWsthList);
+            wsth_list_text.text = mWsthList;
+        }
         onMWsthSvg64Changed : jsonModelUpdate()
         onMWsthList64Changed : jsonModelUpdate()
         onMWslStatusChanged : jsonModelUpdate()
