@@ -222,7 +222,7 @@ DIST          = /home/dev/Qt/5.15.2/android/mkspecs/features/spec_pre.prf \
 		/home/dev/Qt/5.15.2/android/mkspecs/android-clang/qmake.conf \
 		/home/dev/Qt/5.15.2/android/mkspecs/features/spec_post.prf \
 		/home/dev/Qt/5.15.2/android/mkspecs/features/android/spec_post.prf \
-		/home/dev/.qmake.stash \
+		../.qmake.stash \
 		/home/dev/Qt/5.15.2/android/mkspecs/features/exclusive_builds.prf \
 		/home/dev/Qt/5.15.2/android/mkspecs/features/toolchain.prf \
 		/home/dev/Qt/5.15.2/android/mkspecs/features/default_pre.prf \
@@ -289,6 +289,7 @@ clean: compiler_clean
 
 distclean: clean 
 	-$(DEL_FILE) $(TARGET) 
+	-$(DEL_FILE) .qmake.stash
 	-$(DEL_FILE) Makefile
 
 
@@ -479,7 +480,7 @@ tmp/moc_main.cpp: ../../../src/cpp/main.h \
 		/home/dev/Qt/5.15.2/android/include/QtGui/qtouchdevice.h \
 		tmp/moc_predefs.h \
 		/home/dev/Qt/5.15.2/android/bin/moc
-	/home/dev/Qt/5.15.2/android/bin/moc $(DEFINES) --include /home/dev/control-ui-lqml/lqml/apps/control-ui-backend/build-android/tmp/moc_predefs.h -I/home/dev/Qt/5.15.2/android/mkspecs/android-clang -I/home/dev/control-ui-lqml/lqml/apps/control-ui-backend -I/home/dev/ecl/android/32bit/ecl-android/include -I/home/dev/Qt/5.15.2/android/include -I/home/dev/Qt/5.15.2/android/include/QtQuick -I/home/dev/Qt/5.15.2/android/include/QtSvg -I/home/dev/Qt/5.15.2/android/include/QtWidgets -I/home/dev/Qt/5.15.2/android/include/QtGui -I/home/dev/Qt/5.15.2/android/include/QtQmlModels -I/home/dev/Qt/5.15.2/android/include/QtQml -I/home/dev/Qt/5.15.2/android/include/QtWebSockets -I/home/dev/Qt/5.15.2/android/include/QtNetwork -I/home/dev/Qt/5.15.2/android/include/QtAndroidExtras -I/home/dev/Qt/5.15.2/android/include/QtCore -I. -I/usr/local/include -I/home/dev/Android/Sdk/ndk/android-ndk-r10e/toolchains/llvm-3.6/prebuilt/linux-x86_64/lib/clang/3.6/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../../src/cpp/main.h -o tmp/moc_main.cpp
+	/home/dev/Qt/5.15.2/android/bin/moc $(DEFINES) --include /home/dev/control-ui-lqml/lqml/apps/control-ui-backend/build-android/tmp/moc_predefs.h -I/home/dev/Qt/5.15.2/android/mkspecs/android-clang -I/home/dev/control-ui-lqml/lqml/apps/control-ui-backend -I/home/dev/ecl/android/32bit/ecl-android/include -I/home/dev/Qt/5.15.2/android/include -I/home/dev/Qt/5.15.2/android/include/QtQuick -I/home/dev/Qt/5.15.2/android/include/QtSvg -I/home/dev/Qt/5.15.2/android/include/QtWidgets -I/home/dev/Qt/5.15.2/android/include/QtGui -I/home/dev/Qt/5.15.2/android/include/QtQmlModels -I/home/dev/Qt/5.15.2/android/include/QtQml -I/home/dev/Qt/5.15.2/android/include/QtWebSockets -I/home/dev/Qt/5.15.2/android/include/QtNetwork -I/home/dev/Qt/5.15.2/android/include/QtAndroidExtras -I/home/dev/Qt/5.15.2/android/include/QtCore -I. -I/usr/include/c++ -I/usr/local/include -I/home/dev/Android/Sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/9.0.8/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../../src/cpp/main.h -o tmp/moc_main.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:

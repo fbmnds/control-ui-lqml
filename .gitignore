@@ -1,4 +1,5 @@
 TODO
+android-build/
 _*
 *.eclrc
 *.*history
@@ -19,3 +20,4 @@ moc_*.cpp
 cache
 tmp*
 qrc_*.cpp
+*.so
