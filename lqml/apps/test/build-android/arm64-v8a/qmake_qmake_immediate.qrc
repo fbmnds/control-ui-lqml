@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+<file alias="qml/main.qml">/home/dev/control-ui-lqml/lqml/apps/control-ui/qml/main.qml</file>
+<file alias="qml/svg/simple-example2.svg">/home/dev/control-ui-lqml/lqml/apps/control-ui/qml/svg/simple-example2.svg</file>
+<file alias="qml/test.qml">/home/dev/control-ui-lqml/lqml/apps/control-ui/qml/test.qml</file>
+</qresource>
+</RCC>

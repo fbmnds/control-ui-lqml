@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>svg/simple-example2.svg</file>
+    </qresource>
+</RCC>

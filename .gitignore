@@ -1,3 +1,4 @@
+android-build/
 TODO
 _*
 *.eclrc
@@ -6,8 +7,7 @@ _*
 *.obj
 *.dylib
 *.dll
-*.qm
-*.stash
+*.qm*.stash
 *.ts
 *.version
 *~
